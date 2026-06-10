@@ -1,0 +1,64 @@
+extends CanvasLayer
+## LevelUpMenu — shown on level-up, offers 3 random upgrade choices.
+
+@onready var card_container: HBoxContainer = $Panel/CardContainer
+@onready var card_scene: PackedScene = preload("res://scenes/upgrade_card.tscn")
+
+var _current_choices: Array = []
+var _is_showing: bool = false
+
+
+func _ready() -> void:
+	hide()
+	GameManager.level_up.connect(_on_level_up)
+
+
+func _on_level_up(_new_level: int) -> void:
+	_effects().freeze(0.06)
+	if _is_showing:
+		# queue another level-up for after this pick
+		call_deferred("_show_choices")
+		return
+	_show_choices()
+
+
+func _show_choices() -> void:
+	_current_choices = UpgradeManager.generate_choices(3)
+	if _current_choices.is_empty():
+		return
+
+	# Clear previous cards
+	for c in card_container.get_children():
+		c.queue_free()
+
+	# Build new cards
+	for upgrade in _current_choices:
+		var card: Node = card_scene.instantiate()
+		card_container.add_child(card)
+		card.setup(upgrade)
+		card.selected.connect(_on_card_selected.bind(upgrade.id))
+
+	show()
+	_is_showing = true
+	get_tree().paused = true
+
+
+func _on_card_selected(upgrade_id: String) -> void:
+	var player: Node2D = _find_player()
+	if player:
+		UpgradeManager.apply_upgrade(upgrade_id, player)
+
+	_is_showing = false
+	get_tree().paused = false
+	hide()
+
+
+func _find_player() -> Node2D:
+	var players: Array[Node] = get_tree().get_nodes_in_group("player")
+	if players.size() > 0:
+		return players[0]
+	return null
+
+
+func _effects() -> Node:
+	return get_node_or_null("/root/Main/EffectsManager")

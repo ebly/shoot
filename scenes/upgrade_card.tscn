@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/upgrade_card.gd" id="1_card"]
+
+[node name="UpgradeCard" type="Panel"]
+custom_minimum_size = Vector2(180, 200)
+script = ExtResource("1_card")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NameLabel" type="Label" parent="VBox"]
+text = "Upgrade"
+horizontal_alignment = 1
+
+[node name="DescLabel" type="Label" parent="VBox"]
+text = "Description"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="PickButton" type="Button" parent="VBox"]
+text = "Pick"
+
+[connection signal="pressed" from="VBox/PickButton" to="." method="_on_pick_button_pressed"]
