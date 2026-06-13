@@ -34,7 +34,7 @@ func generate_choices(count: int = 3) -> Array:
 
 
 ## Apply an upgrade to the player.
-func apply_upgrade(upgrade_id: String, player: Node2D) -> void:
+func apply_upgrade(upgrade_id: String, player) -> void:
 	for u in _upgrade_pool:
 		if u.id == upgrade_id:
 			u.apply(player)

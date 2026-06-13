@@ -52,7 +52,7 @@ enabled = true   # language server tools; servers launch lazily when used
 # Rules are "Tool" or "Tool(specifier)"; e.g. Bash(go test:*), Edit(src/**).
 mode  = "ask"
 # deny = ["Bash(rm -rf*)", "Bash(git push*)"]   # hard-blocked in every mode
-allow = ["Edit(scripts/asset_db.gd)", "Bash(cd E:\\workspacedemo\\shoot && git init && git branch -M main)", "Bash(git init && git branch -M main)", "Bash(git add -A && git status)"]
+allow = ["Edit(scripts/asset_db.gd)", "Bash(git add -A && git status)", "Bash(git commit:*)", "Bash(cd /e/workspacedemo/shoot && git rm -r --cached .reasonix/ 2>/dev/null; git add -A && git commit --amend -m \"僵尸幸存者改造：主菜单+选关地图+左右射击+撕咬机制\" && git push --force)"]
 # ask = ["Edit(src/**)"]   # force a prompt even if otherwise allowed
 
 [sandbox]

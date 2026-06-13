@@ -57,7 +57,7 @@ func _on_game_started() -> void:
 func _on_restart_pressed() -> void:
 	GameManager.reset()
 	get_tree().paused = false
-	get_tree().reload_current_scene()
+	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
 
 
 func _find_player() -> Node2D:

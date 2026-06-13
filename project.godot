@@ -11,9 +11,16 @@ config_version=5
 [application]
 
 config/name="shoot"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
 config/icon="res://icon.svg"
-run/main_scene="res://scenes/main.tscn"
+
+[autoload]
+
+AssetDB="*res://scripts/asset_db.gd"
+GameManager="*res://scripts/game_manager.gd"
+UpgradeManager="*res://scripts/upgrades/upgrade_manager.gd"
+ProgressManager="*res://scripts/progress_manager.gd"
 
 [physics]
 
@@ -26,9 +33,3 @@ renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 rendering/viewport/transparent_background=false
 rendering/environment/defaults/default_clear_color=Color(0.05, 0.05, 0.12, 1)
-
-[autoload]
-
-AssetDB="*res://scripts/asset_db.gd"
-GameManager="*res://scripts/game_manager.gd"
-UpgradeManager="*res://scripts/upgrades/upgrade_manager.gd"

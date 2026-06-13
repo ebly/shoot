@@ -1,6 +1,9 @@
 # Godot
 .godot/
 
+# Reasonix local state
+.reasonix/
+
 # OS
 .DS_Store
 Thumbs.db

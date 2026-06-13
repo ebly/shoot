@@ -9,6 +9,7 @@ var _is_showing: bool = false
 
 
 func _ready() -> void:
+	process_mode = PROCESS_MODE_WHEN_PAUSED
 	hide()
 	GameManager.level_up.connect(_on_level_up)
 
@@ -33,10 +34,10 @@ func _show_choices() -> void:
 
 	# Build new cards
 	for upgrade in _current_choices:
-		var card: Node = card_scene.instantiate()
+		var card = card_scene.instantiate()
 		card_container.add_child(card)
 		card.setup(upgrade)
-		card.selected.connect(_on_card_selected.bind(upgrade.id))
+		card.selected.connect(_on_card_selected)
 
 	show()
 	_is_showing = true
@@ -44,7 +45,7 @@ func _show_choices() -> void:
 
 
 func _on_card_selected(upgrade_id: String) -> void:
-	var player: Node2D = _find_player()
+	var player = _find_player()
 	if player:
 		UpgradeManager.apply_upgrade(upgrade_id, player)
 
@@ -53,7 +54,7 @@ func _on_card_selected(upgrade_id: String) -> void:
 	hide()
 
 
-func _find_player() -> Node2D:
+func _find_player():
 	var players: Array[Node] = get_tree().get_nodes_in_group("player")
 	if players.size() > 0:
 		return players[0]

@@ -9,19 +9,19 @@ var spawn_interval: float = 1.8        # seconds between spawns
 var time_elapsed: float = 0.0
 var fast_enemy_threshold: float = 60.0  # seconds until fast enemies appear
 
-# enemy type definitions
-var basic_enemy: Dictionary = {
+# zombie type definitions
+var basic_zombie: Dictionary = {
 	"max_hp": 30.0,
-	"speed": 110.0,
-	"contact_damage": 10.0,
+	"speed": 100.0,
+	"grab_damage": 6.0,
 	"xp_value": 5,
 	"texture_key": "enemy_texture",
 }
 
-var fast_enemy: Dictionary = {
+var fast_zombie: Dictionary = {
 	"max_hp": 15.0,
-	"speed": 200.0,
-	"contact_damage": 8.0,
+	"speed": 180.0,
+	"grab_damage": 4.0,
 	"xp_value": 3,
 	"texture_key": "fast_enemy_texture",
 }
@@ -53,13 +53,13 @@ func _spawn_wave() -> void:
 
 
 func _spawn_one() -> void:
-	var e: Node = enemy_scene.instantiate()
+	var e = enemy_scene.instantiate()
 	e.global_position = _random_edge_pos()
 
 	# Pick type
-	var type: Dictionary = basic_enemy
+	var type: Dictionary = basic_zombie
 	if time_elapsed >= fast_enemy_threshold and randf() < 0.35:
-		type = fast_enemy
+		type = fast_zombie
 
 	e.set_enemy_type(type)
 

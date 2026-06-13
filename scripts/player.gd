@@ -1,13 +1,14 @@
 extends CharacterBody2D
-## Player — 8-direction movement, health, invincibility frames, magnet pickup.
+## Player — 8-direction movement, left/right facing, health, invincibility frames.
 
 signal died
+signal facing_changed(facing_right: bool)
 
 @export var stats: PlayerStats
 var weapons: Array[Node] = []
 var invincible: bool = false
 var invincible_timer: float = 0.0
-var weapon_offset: float = 0.0
+var facing_right: bool = true
 
 
 func _ready() -> void:
@@ -30,7 +31,7 @@ func _ready() -> void:
 	magnet_shape.radius = stats.magnet_radius
 	$MagnetArea/CollisionShape2D.shape = magnet_shape
 
-	# default weapon — equipped by main scene, but provide fallback
+	# default weapon
 	if weapons.is_empty():
 		add_default_weapon()
 
@@ -48,6 +49,10 @@ func add_weapon(weapon: Node) -> void:
 	add_child(weapon)
 
 
+func get_facing_dir() -> Vector2:
+	return Vector2.RIGHT if facing_right else Vector2.LEFT
+
+
 func _physics_process(delta: float) -> void:
 	if GameManager.is_game_over:
 		velocity = Vector2.ZERO
@@ -58,6 +63,16 @@ func _physics_process(delta: float) -> void:
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	velocity = input_dir * stats.move_speed
 	move_and_slide()
+
+	# ── facing direction ──
+	if input_dir.x < -0.1 and facing_right:
+		facing_right = false
+		$Sprite2D.flip_h = true
+		facing_changed.emit(false)
+	elif input_dir.x > 0.1 and not facing_right:
+		facing_right = true
+		$Sprite2D.flip_h = false
+		facing_changed.emit(true)
 
 	# ── invincibility flash ──
 	if invincible:
@@ -71,7 +86,7 @@ func _physics_process(delta: float) -> void:
 	if stats.hp < stats.max_hp:
 		stats.hp = min(stats.hp + stats.hp_regen * delta, stats.max_hp)
 
-	# ── update magnet radius (may have changed via upgrades) ──
+	# ── update magnet radius ──
 	if $MagnetArea/CollisionShape2D.shape is CircleShape2D:
 		($MagnetArea/CollisionShape2D.shape as CircleShape2D).radius = stats.magnet_radius
 
@@ -93,6 +108,10 @@ func take_damage(amount: float) -> void:
 
 func get_magnet_radius() -> float:
 	return stats.magnet_radius
+
+
+func is_invincible() -> bool:
+	return invincible
 
 
 func _effects() -> Node:

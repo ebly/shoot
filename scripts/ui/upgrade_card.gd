@@ -1,7 +1,7 @@
 extends Panel
 ## A single upgrade card in the LevelUpMenu.
 
-signal selected
+signal selected(upgrade_id: String)
 
 var upgrade: UpgradeResource = null
 
@@ -16,4 +16,5 @@ func setup(upg: UpgradeResource) -> void:
 
 
 func _on_pick_button_pressed() -> void:
-	selected.emit()
+	if upgrade:
+		selected.emit(upgrade.id)
