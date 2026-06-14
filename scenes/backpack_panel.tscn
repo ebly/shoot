@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/backpack_panel.gd" id="1_bp"]
+[ext_resource type="PackedScene" path="res://scenes/backpack_slot.tscn" id="2_slot"]
 
 [node name="BackpackPanel" type="CanvasLayer"]
 layer = 90
@@ -18,33 +19,44 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -200.0
-offset_right = 250.0
-offset_bottom = 200.0
+offset_left = -220.0
+offset_top = -290.0
+offset_right = 220.0
+offset_bottom = 290.0
 
 [node name="VBox" type="VBoxContainer" parent="Panel"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 12.0
-offset_right = -12.0
-offset_bottom = -12.0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = -10.0
+theme_override_constants/separation = 8
 
 [node name="TitleLabel" type="Label" parent="Panel/VBox"]
-text = "背 包 物 品"
+text = "背  包"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 18
 
-[node name="ItemContainer" type="VBoxContainer" parent="Panel/VBox"]
+[node name="GridContainer" type="GridContainer" parent="Panel/VBox"]
+columns = 5
 size_flags_vertical = 3
-theme_override_constants/separation = 4
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
 
-[node name="EmptyLabel" type="Label" parent="Panel/VBox"]
-text = "背包是空的"
-horizontal_alignment = 1
+[node name="BottomBar" type="HBoxContainer" parent="Panel/VBox"]
+size_flags_vertical = 0
+theme_override_constants/separation = 12
+
+[node name="GoldLabel" type="Label" parent="Panel/VBox/BottomBar"]
+text = "💰 金币: 0"
+size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
+
+[node name="UnlockHint" type="Label" parent="Panel/VBox/BottomBar"]
+text = "点击🔒格子花费50金币解锁"
+theme_override_font_sizes/font_size = 11
 
 [node name="CloseButton" type="Button" parent="Panel/VBox"]
 text = "关  闭"

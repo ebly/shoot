@@ -13,6 +13,7 @@ extends Resource
 @export var extra_projectiles: int = 0
 @export var magnet_radius: float = 60.0
 @export var xp_mult: float = 1.0
+@export var body_size: float = 1.0   # 体型：越大越难被击退
 
 
 func reset() -> void:
@@ -27,3 +28,4 @@ func reset() -> void:
 	extra_projectiles = 0
 	magnet_radius = 60.0
 	xp_mult = 1.0
+	body_size = 1.0

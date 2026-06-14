@@ -5,16 +5,16 @@ extends RefCounted
 static func all() -> Array[UpgradeResource]:
 	var list: Array[UpgradeResource] = []
 
-	list.append(_make(UpgradeResource.MaxHpUp.new(),       "max_hp",       "Hull Armor",      "+20 max HP",            5))
-	list.append(_make(UpgradeResource.RegenUp.new(),       "regen",        "Nano Repair",     "+0.3 HP/sec regen",     5))
-	list.append(_make(UpgradeResource.SpeedUp.new(),       "speed",        "Afterburner",     "+30 move speed",        5))
-	list.append(_make(UpgradeResource.DamageUp.new(),      "damage",       "Armor-Piercing",  "+20% bullet damage",    5))
-	list.append(_make(UpgradeResource.FireRateUp.new(),    "fire_rate",    "Auto-Feeder",     "+15% fire rate",        5))
-	list.append(_make(UpgradeResource.BulletSpeedUp.new(), "bullet_speed", "Muzzle Booster",  "+20% bullet speed",     5))
-	list.append(_make(UpgradeResource.BulletSizeUp.new(),  "bullet_size",  "Heavy Rounds",    "+15% bullet size",      5))
-	list.append(_make(UpgradeResource.MultiShotUp.new(),   "multishot",    "Twin-Link",       "+1 extra projectile",   3))
-	list.append(_make(UpgradeResource.MagnetUp.new(),      "magnet",       "Tractor Beam",    "+40 pickup radius",     5))
-	list.append(_make(UpgradeResource.XpBoostUp.new(),     "xp_boost",     "Field Study",     "+20% XP gain",          5))
+	list.append(_make(UpgradeResource.MaxHpUp.new(),       "max_hp",       "防弹衣",           "生命上限 +20",              5))
+	list.append(_make(UpgradeResource.RegenUp.new(),       "regen",        "急救包",           "生命恢复 +0.3/秒",         5))
+	list.append(_make(UpgradeResource.SpeedUp.new(),       "speed",        "跑鞋",             "移速 +30",                  5))
+	list.append(_make(UpgradeResource.DamageUp.new(),      "damage",       "穿甲弹",           "伤害 +20%",                 5))
+	list.append(_make(UpgradeResource.FireRateUp.new(),    "fire_rate",    "快速换弹",         "射速 +15%",                 5))
+	list.append(_make(UpgradeResource.BulletSpeedUp.new(), "bullet_speed", "膛线改造",         "子弹速度 +20%",             5))
+	list.append(_make(UpgradeResource.BulletSizeUp.new(),  "bullet_size",  "重型弹药",         "子弹大小 +15%",             5))
+	list.append(_make(UpgradeResource.MultiShotUp.new(),   "multishot",    "双持",             "弹道 +1",                   3))
+	list.append(_make(UpgradeResource.MagnetUp.new(),      "magnet",       "生存直觉",         "拾取范围 +40",             5))
+	list.append(_make(UpgradeResource.XpBoostUp.new(),     "xp_boost",     "狩猎经验",         "经验获取 +20%",             5))
 
 	return list
 

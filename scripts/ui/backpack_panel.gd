@@ -1,9 +1,13 @@
 extends CanvasLayer
-## 背包面板 — 查看已拾取但未装备的升级，点击「装备」生效。
+## 背包面板 — 5×6 格子布局，前 N 格解锁，后 20 格锁住需金币开启。
 
-@onready var item_container: VBoxContainer = $Panel/VBox/ItemContainer
-@onready var empty_label: Label = $Panel/VBox/EmptyLabel
-@onready var item_row_scene: PackedScene = preload("res://scenes/backpack_item_row.tscn")
+const TOTAL_SLOTS: int = GameManager.TOTAL_BACKPACK_SLOTS
+
+@onready var grid: GridContainer = $Panel/VBox/GridContainer
+@onready var gold_label: Label = $Panel/VBox/BottomBar/GoldLabel
+@onready var slot_scene: PackedScene = preload("res://scenes/backpack_slot.tscn")
+
+var _slots: Array = []  # 所有格子节点的引用
 
 
 func _ready() -> void:
@@ -23,34 +27,62 @@ func close() -> void:
 
 
 func _refresh() -> void:
-	# 清空旧列表
-	for c in item_container.get_children():
+	# 重建格子
+	for c in grid.get_children():
 		c.queue_free()
+	_slots.clear()
 
-	if UpgradeManager.is_backpack_empty():
-		empty_label.show()
-		return
-
-	empty_label.hide()
-
-	# 遍历背包（upgrade_pool 获取完整信息）
+	var unlocked: int = GameManager.unlocked_backpack_slots
+	# 按升级池顺序排列物品，保持显示顺序一致
+	var item_list: Array = []
 	for u in UpgradeManager.get_upgrade_pool():
 		var cnt: int = UpgradeManager.get_backpack_count(u.id)
-		if cnt <= 0:
-			continue
-		var row: Panel = item_row_scene.instantiate()
-		item_container.add_child(row)
-		row.setup(u, cnt)
-		row.equip_pressed.connect(_on_row_equip.bind(u.id))
+		if cnt > 0:
+			item_list.append({"id": u.id, "count": cnt})
+
+	# 创建 30 个格子
+	for i in range(TOTAL_SLOTS):
+		var slot = slot_scene.instantiate()
+		grid.add_child(slot)
+		_slots.append(slot)
+
+		var locked: bool = i >= unlocked
+		var occupied: bool = false
+		var upg_id: String = ""
+		var cnt: int = 0
+
+		if not locked and i < item_list.size():
+			occupied = true
+			upg_id = item_list[i]["id"]
+			cnt = item_list[i]["count"]
+
+		slot.setup(i, locked, occupied, upg_id, cnt)
+		slot.slot_pressed.connect(_on_slot_pressed)
+		slot.unlock_requested.connect(_on_unlock_requested)
+
+	gold_label.text = "💰 金币: %d" % GameManager.gold
 
 
-func _on_row_equip(upgrade_id: String) -> void:
+func _on_slot_pressed(slot_index: int) -> void:
+	var slot = _slots[slot_index]
+	if not slot.is_occupied:
+		return
 	var player = _find_player()
 	if player:
-		if UpgradeManager.equip_from_backpack(upgrade_id, player):
+		if UpgradeManager.equip_from_backpack(slot.upgrade_id, player):
 			_refresh()
 			if UpgradeManager.is_backpack_empty():
 				close()
+
+
+func _on_unlock_requested(slot_index: int) -> void:
+	if GameManager.unlock_slot():
+		_refresh()
+	else:
+		# 显示余额不足提示（简单闪烁金币标签）
+		gold_label.modulate = Color(1, 0.3, 0.3, 1)
+		await get_tree().create_timer(0.3).timeout
+		gold_label.modulate = Color.WHITE
 
 
 func _find_player():

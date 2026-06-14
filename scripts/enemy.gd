@@ -8,12 +8,17 @@ extends CharacterBody2D
 @export var grab_range: float = 18.0      # distance to initiate grab
 @export var escape_range: float = 45.0    # distance player must reach to escape grab
 @export var xp_value: int = 5
+@export var body_size: float = 1.0        # 体型：越大越难被击退
 
 var hp: float
 var player_ref: CharacterBody2D = null
 var is_grabbing: bool = false
 var grab_timer: float = 0.0
 var _sprite_orig_scale: Vector2 = Vector2(2.0, 2.0)
+var _is_dead: bool = false
+var _knockback: Vector2 = Vector2.ZERO   # 击退速度
+var _stun_timer: float = 0.0              # 击退硬直计时
+const KNOCKBACK_DECAY: float = 30.0       # 击退衰减速度（高=快弹快停）
 
 
 func _ready() -> void:
@@ -40,6 +45,7 @@ func set_enemy_type(type_data: Dictionary) -> void:
 	speed = type_data.get("speed", 110.0)
 	grab_damage = type_data.get("grab_damage", 6.0)
 	xp_value = type_data.get("xp_value", 5)
+	body_size = type_data.get("body_size", 1.0)
 	hp = max_hp
 
 	var tex_key: String = type_data.get("texture_key", "enemy_texture")
@@ -64,6 +70,10 @@ func _physics_process(delta: float) -> void:
 		if player_ref == null:
 			return
 
+	# ── knockback decay ──
+	_knockback = _knockback.move_toward(Vector2.ZERO, KNOCKBACK_DECAY * delta)
+	_stun_timer = max(0.0, _stun_timer - delta)
+
 	var dir_to_player: Vector2 = player_ref.global_position - global_position
 	var dist: float = dir_to_player.length()
 
@@ -75,7 +85,10 @@ func _physics_process(delta: float) -> void:
 			modulate = Color.WHITE
 		else:
 			# Move toward the player's position
-			velocity = dir_to_player.normalized() * speed * 1.5
+			if _stun_timer > 0.0:
+				velocity = _knockback
+			else:
+				velocity = dir_to_player.normalized() * speed * 1.5 + _knockback
 			move_and_slide()
 
 			# Damage over time
@@ -89,7 +102,10 @@ func _physics_process(delta: float) -> void:
 
 	# ── CHASE state ──
 	var dir: Vector2 = dir_to_player.normalized()
-	velocity = dir * speed
+	if _stun_timer > 0.0:
+		velocity = _knockback
+	else:
+		velocity = dir * speed + _knockback
 	move_and_slide()
 
 	# Check grab initiation
@@ -100,27 +116,46 @@ func _physics_process(delta: float) -> void:
 
 
 func take_damage(amount: float) -> void:
+	if _is_dead:
+		return
 	hp -= amount
 	if hp <= 0.0:
 		die()
 
 
+func apply_knockback(dir: Vector2, power: float) -> void:
+	# 体型越大越难击退，最小保护值 0.3
+	var resistance: float = max(body_size, 0.3)
+	var force: float = power / resistance
+	_knockback += dir * force
+	# 短暂硬直，确保回弹不受追击干扰
+	_stun_timer = max(_stun_timer, 0.12)
+	# 击退打断撕咬
+	if is_grabbing:
+		is_grabbing = false
+		modulate = Color.WHITE
+
+
 func die() -> void:
+	if _is_dead:
+		return
+	_is_dead = true
 	_effects().death_burst(global_position)
 	GameManager.add_score(10)
-	GameManager.enemies_killed += 1
-	var drop_pos: Vector2 = global_position
-	var drop_xp: int = xp_value
-	call_deferred("_spawn_xp_orb", drop_pos, drop_xp)
+	GameManager.on_enemy_killed()
+	# 掉落金币（实体拾取物）
+	call_deferred("_spawn_gold_coin")
+	# 经验直接增加（无需拾取）
+	GameManager.gain_xp(xp_value)
 	queue_free()
 
 
-func _spawn_xp_orb(pos: Vector2, xp: int) -> void:
-	var orb_scene: PackedScene = load("res://scenes/xp_orb.tscn")
-	var orb: Area2D = orb_scene.instantiate()
-	orb.global_position = pos
-	orb.xp_amount = xp
-	get_parent().add_child(orb)
+func _spawn_gold_coin() -> void:
+	var coin_scene: PackedScene = load("res://scenes/gold_coin.tscn")
+	var coin: Area2D = coin_scene.instantiate()
+	coin.global_position = global_position
+	coin.gold_amount = randi_range(1, 3)
+	get_parent().add_child(coin)
 
 
 func _on_hitbox_body_entered(body: Node2D) -> void:

@@ -7,6 +7,7 @@ var enemy_texture: ImageTexture
 var fast_enemy_texture: ImageTexture
 var bullet_texture: ImageTexture
 var xp_orb_texture: ImageTexture
+var gold_coin_texture: ImageTexture
 var star_texture: ImageTexture
 
 
@@ -16,6 +17,7 @@ func _ready() -> void:
 	fast_enemy_texture = _make_from_pattern(FAST_ENEMY_PATTERN, FAST_ENEMY_COLORS)
 	bullet_texture = _make_dot(6, Color(1.0, 0.85, 0.2, 1.0))
 	xp_orb_texture = _make_from_pattern(XP_PATTERN, XP_COLORS)
+	gold_coin_texture = _make_dot(8, Color(1.0, 0.80, 0.10, 1.0))
 	star_texture = _make_dot(3, Color(0.9, 0.9, 0.95, 0.7))
 
 

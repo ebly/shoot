@@ -29,8 +29,13 @@ func _process(delta: float) -> void:
 	global_position += direction * speed * delta
 
 
+const KNOCKBACK_PER_DAMAGE: float = 3.0   # 击退力 = 伤害 × 此系数
+
+
 func _on_hit(body: Node2D) -> void:
 	if body.is_in_group("enemies"):
 		if body.has_method("take_damage"):
 			body.take_damage(damage)
+		if body.has_method("apply_knockback"):
+			body.apply_knockback(direction.normalized(), damage * KNOCKBACK_PER_DAMAGE)
 		queue_free()

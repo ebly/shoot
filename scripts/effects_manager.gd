@@ -70,3 +70,7 @@ func xp_pop(pos: Vector2) -> void:
 
 func damage_burst(pos: Vector2) -> void:
 	burst(pos, 4, Color(1.0, 0.85, 0.2), Vector2(20, 60), Vector2(1.5, 3.0), 0.25)
+
+
+func gold_pop(pos: Vector2) -> void:
+	burst(pos, 5, Color(1.0, 0.75, 0.1), Vector2(20, 70), Vector2(1.5, 3.5), 0.3)
