@@ -1,5 +1,5 @@
 extends CanvasLayer
-## LevelUpMenu — shown on level-up, offers 3 random upgrade choices.
+## 升级菜单 — 升级时出现，选择「拾取→背包」或「装备→角色」。
 
 @onready var card_container: HBoxContainer = $Panel/CardContainer
 @onready var card_scene: PackedScene = preload("res://scenes/upgrade_card.tscn")
@@ -17,7 +17,6 @@ func _ready() -> void:
 func _on_level_up(_new_level: int) -> void:
 	_effects().freeze(0.06)
 	if _is_showing:
-		# queue another level-up for after this pick
 		call_deferred("_show_choices")
 		return
 	_show_choices()
@@ -28,27 +27,36 @@ func _show_choices() -> void:
 	if _current_choices.is_empty():
 		return
 
-	# Clear previous cards
 	for c in card_container.get_children():
 		c.queue_free()
 
-	# Build new cards
 	for upgrade in _current_choices:
 		var card = card_scene.instantiate()
 		card_container.add_child(card)
 		card.setup(upgrade)
-		card.selected.connect(_on_card_selected)
+		card.picked.connect(_on_picked)
+		card.equipped.connect(_on_equipped)
 
 	show()
 	_is_showing = true
 	get_tree().paused = true
 
 
-func _on_card_selected(upgrade_id: String) -> void:
+## 拾取 → 存入背包，不生效。
+func _on_picked(upgrade_id: String) -> void:
+	UpgradeManager.store_in_backpack(upgrade_id)
+	_close()
+
+
+## 装备 → 直接生效到角色。
+func _on_equipped(upgrade_id: String) -> void:
 	var player = _find_player()
 	if player:
 		UpgradeManager.apply_upgrade(upgrade_id, player)
+	_close()
 
+
+func _close() -> void:
 	_is_showing = false
 	get_tree().paused = false
 	hide()

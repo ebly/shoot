@@ -65,3 +65,10 @@ func _find_player() -> Node2D:
 	if players.size() > 0:
 		return players[0]
 	return null
+
+
+func _on_backpack_pressed() -> void:
+	var bp = get_node_or_null("/root/Main/BackpackPanel")
+	if bp:
+		bp.open()
+

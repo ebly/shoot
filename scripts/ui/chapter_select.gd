@@ -1,5 +1,5 @@
 extends Control
-## ChapterSelect — 自由行走地图，背景地图跟随滚动。
+## ChapterSelect — 自由行走地图，背景滚动，无黑边。
 
 var _ready_done: bool = false
 var _player_pos: Vector2 = Vector2.ZERO
@@ -8,6 +8,7 @@ var _selected_key: String = ""
 var _stage_positions: Dictionary = {}
 var _map_size: Vector2 = Vector2(1600, 900)
 var _screen_size: Vector2 = Vector2(1152, 648)
+var _scale: float = 1.0  # 地图缩放比例（填满屏幕）
 
 @onready var _map_container: Node2D = $MapContainer
 @onready var _map_view: Node2D = $MapContainer/MapView
@@ -17,7 +18,8 @@ var _screen_size: Vector2 = Vector2(1152, 648)
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
-	$BottomBar/EnterButton.hide()
+	$TopBar/TitleLabel.hide()
+	$EnterButton.hide()
 
 	_screen_size = get_viewport_rect().size
 
@@ -25,12 +27,17 @@ func _ready() -> void:
 	var tex: Texture2D = _map_bg.texture
 	if tex:
 		_map_size = Vector2(tex.get_width(), tex.get_height())
-		_map_bg.custom_minimum_size = _map_size
-		_map_bg.size = _map_size
-		_map_darken.custom_minimum_size = _map_size
-		_map_darken.size = _map_size
+		# 计算缩放使地图填满屏幕（无黑边）
+		_scale = max(_screen_size.x / _map_size.x, _screen_size.y / _map_size.y)
+		var scaled: Vector2 = _map_size * _scale
+		_map_bg.custom_minimum_size = scaled
+		_map_bg.size = scaled
+		_map_darken.custom_minimum_size = scaled
+		_map_darken.size = scaled
+		# MapView 缩放匹配背景图
+		_map_view.scale = Vector2(_scale, _scale)
 
-	# 用地图百分比计算关卡位置
+	# 用地图像素坐标计算关卡位置，乘缩放因子
 	var margin_x: float = _map_size.x * 0.1
 	var margin_y: float = _map_size.y * 0.15
 	var start_x: float = margin_x
@@ -49,27 +56,27 @@ func _ready() -> void:
 
 	_map_view.stage_positions = _stage_positions
 
-	# 章节标签（随地图滚动）
+	# 章节标签和关卡数字（作为 MapView 子节点，随地图滚动）
 	for ch in range(1, ProgressManager.total_chapters + 1):
 		var first_key: String = ProgressManager.stage_key(ch, 1)
 		if first_key in _stage_positions:
 			var pos: Vector2 = _stage_positions[first_key]
 			var lbl: Label = Label.new()
 			lbl.text = "第%d章" % ch
-			lbl.position = Vector2(10, pos.y - 6)
-			lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8, 0.9))
+			lbl.position = Vector2(pos.x - 80, pos.y - 8)
+			lbl.add_theme_color_override("font_color", Color(0.9, 0.9, 0.95, 0.9))
+			lbl.add_theme_font_size_override("font_size", 14)
 			_map_view.add_child(lbl)
 
-	# 关卡数字标签（随地图滚动）
 	for key in _stage_positions:
 		var pos: Vector2 = _stage_positions[key]
 		var parts: PackedStringArray = key.split("-")
 		var st: int = int(parts[1])
 		var lbl: Label = Label.new()
 		lbl.text = str(st)
-		lbl.position = pos - Vector2(6, 12)
-		lbl.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
-		lbl.add_theme_font_size_override("font_size", 12)
+		lbl.position = pos - Vector2(5, 10)
+		lbl.add_theme_color_override("font_color", Color(1, 1, 1, 0.95))
+		lbl.add_theme_font_size_override("font_size", 13)
 		_map_view.add_child(lbl)
 
 	# 玩家出生在第一关
@@ -78,7 +85,6 @@ func _ready() -> void:
 		_player_pos = _stage_positions[start_key]
 
 	_map_view.player_pos = _player_pos
-
 	_ready_done = true
 	_update_camera()
 	_map_view.queue_redraw()
@@ -91,6 +97,7 @@ func _process(delta: float) -> void:
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	_player_pos += input * _move_speed * delta
 
+	# 限制到地图范围
 	_player_pos.x = clamp(_player_pos.x, 0, _map_size.x)
 	_player_pos.y = clamp(_player_pos.y, 0, _map_size.y)
 
@@ -101,14 +108,18 @@ func _process(delta: float) -> void:
 
 
 func _update_camera() -> void:
-	if _map_size.x <= 0 or _map_size.y <= 0:
+	if _map_size.x <= 0:
 		return
+	# 缩放后的地图尺寸
+	var scaled: Vector2 = _map_size * _scale
 
-	var offset_x: float = _screen_size.x * 0.5 - _player_pos.x
-	var offset_y: float = _screen_size.y * 0.5 - _player_pos.y
+	# 偏移量：让玩家位于屏幕中央
+	var offset_x: float = _screen_size.x * 0.5 - _player_pos.x * _scale
+	var offset_y: float = _screen_size.y * 0.5 - _player_pos.y * _scale
 
-	offset_x = clamp(offset_x, _screen_size.x - _map_size.x, 0)
-	offset_y = clamp(offset_y, _screen_size.y - _map_size.y, 0)
+	# 限制到地图边界（无黑边）
+	offset_x = clamp(offset_x, _screen_size.x - scaled.x, 0)
+	offset_y = clamp(offset_y, _screen_size.y - scaled.y, 0)
 
 	_map_container.position = Vector2(offset_x, offset_y)
 
@@ -130,11 +141,13 @@ func _check_dot_proximity() -> void:
 		_selected_key = best_key
 		var parts = best_key.split("-")
 		ProgressManager.select_stage(int(parts[0]), int(parts[1]))
-		$BottomBar/EnterButton.show()
-		$BottomBar/StageInfoLabel.text = "第%s章 第%s关" % [parts[0], parts[1]]
+		$TopBar/TitleLabel.show()
+		$TopBar/TitleLabel.text = "第%s章 · 第%s关" % [parts[0], parts[1]]
+		$EnterButton.show()
 	elif best_key == "" and _selected_key != "":
 		_selected_key = ""
-		$BottomBar/EnterButton.hide()
+		$TopBar/TitleLabel.hide()
+		$EnterButton.hide()
 
 	_map_view.selected_key = _selected_key
 

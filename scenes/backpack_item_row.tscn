@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/backpack_item_row.gd" id="1_row"]
+
+[node name="BackpackItemRow" type="Panel"]
+custom_minimum_size = Vector2(0, 36)
+script = ExtResource("1_row")
+
+[node name="HBox" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="NameLabel" type="Label" parent="HBox"]
+text = "升级名称"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 14
+
+[node name="CountLabel" type="Label" parent="HBox"]
+text = "×1"
+theme_override_font_sizes/font_size = 14
+
+[node name="EquipButton" type="Button" parent="HBox"]
+text = "装 备"
+
+[connection signal="pressed" from="HBox/EquipButton" to="." method="_on_equip_button_pressed"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="1_player"]
 [ext_resource type="Script" path="res://scripts/enemy_spawner.gd" id="2_spawner"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/starfield.gd" id="5_starfield"]
 [ext_resource type="Script" path="res://scripts/effects_manager.gd" id="6_effects"]
 [ext_resource type="Script" path="res://scripts/camera_follow.gd" id="7_camera"]
+[ext_resource type="PackedScene" path="res://scenes/backpack_panel.tscn" id="8_backpack"]
 
 [node name="Main" type="Node2D"]
 
@@ -30,3 +31,5 @@ script = ExtResource("2_spawner")
 
 [node name="EffectsManager" type="Node" parent="."]
 script = ExtResource("6_effects")
+
+[node name="BackpackPanel" parent="." instance=ExtResource("8_backpack")]

@@ -62,6 +62,7 @@ func reset() -> void:
 	survival_time = 0.0
 	is_game_over = false
 	enemies_killed = 0
+	UpgradeManager.reset_backpack()
 	xp_changed.emit(0, xp_to_next())
 	game_started.emit()
 

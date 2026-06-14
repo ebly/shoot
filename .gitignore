@@ -4,6 +4,9 @@
 # Reasonix local state
 .reasonix/
 
+# CodeGraph local state
+.codegraph/
+
 # OS
 .DS_Store
 Thumbs.db
