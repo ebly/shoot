@@ -1,30 +1,42 @@
 extends Control
-## ChapterSelect — 自由行走地图，碰到圆点选中关卡。
+## ChapterSelect — 自由行走地图，背景地图跟随滚动。
 
 var _ready_done: bool = false
 var _player_pos: Vector2 = Vector2.ZERO
-var _move_speed: float = 300.0
+var _move_speed: float = 250.0
 var _selected_key: String = ""
 var _stage_positions: Dictionary = {}
-var _map_margin_left: float = 140
-var _map_margin_right: float = 40
-var _map_margin_top: float = 80
-var _map_margin_bottom: float = 80
+var _map_size: Vector2 = Vector2(1600, 900)
+var _screen_size: Vector2 = Vector2(1152, 648)
 
-@onready var _map_view: Node2D = $MapView
+@onready var _map_container: Node2D = $MapContainer
+@onready var _map_view: Node2D = $MapContainer/MapView
+@onready var _map_bg: TextureRect = $MapContainer/MapBg
+@onready var _map_darken: ColorRect = $MapContainer/MapDarken
 
 
 func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	$BottomBar/EnterButton.hide()
 
-	var vp: Rect2 = get_viewport_rect()
-	var area_w: float = max(vp.size.x, 800)
-	var area_h: float = max(vp.size.y, 600)
-	var start_x: float = _map_margin_left
-	var end_x: float = area_w - _map_margin_right
-	var start_y: float = _map_margin_top
-	var end_y: float = area_h - _map_margin_bottom
+	_screen_size = get_viewport_rect().size
+
+	# 获取地图图片尺寸
+	var tex: Texture2D = _map_bg.texture
+	if tex:
+		_map_size = Vector2(tex.get_width(), tex.get_height())
+		_map_bg.custom_minimum_size = _map_size
+		_map_bg.size = _map_size
+		_map_darken.custom_minimum_size = _map_size
+		_map_darken.size = _map_size
+
+	# 用地图百分比计算关卡位置
+	var margin_x: float = _map_size.x * 0.1
+	var margin_y: float = _map_size.y * 0.15
+	var start_x: float = margin_x
+	var end_x: float = _map_size.x - margin_x
+	var start_y: float = margin_y
+	var end_y: float = _map_size.y - margin_y * 0.5
 	var spacing_y: float = (end_y - start_y) / max(ProgressManager.total_chapters - 1, 1)
 
 	for ch in range(1, ProgressManager.total_chapters + 1):
@@ -35,7 +47,9 @@ func _ready() -> void:
 			var st_x: float = start_x + (st - 1) * spacing_x
 			_stage_positions[ProgressManager.stage_key(ch, st)] = Vector2(st_x, ch_y)
 
-	# 章节标签
+	_map_view.stage_positions = _stage_positions
+
+	# 章节标签（随地图滚动）
 	for ch in range(1, ProgressManager.total_chapters + 1):
 		var first_key: String = ProgressManager.stage_key(ch, 1)
 		if first_key in _stage_positions:
@@ -44,8 +58,9 @@ func _ready() -> void:
 			lbl.text = "第%d章" % ch
 			lbl.position = Vector2(10, pos.y - 6)
 			lbl.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8, 0.9))
-			add_child(lbl)
+			_map_view.add_child(lbl)
 
+	# 关卡数字标签（随地图滚动）
 	for key in _stage_positions:
 		var pos: Vector2 = _stage_positions[key]
 		var parts: PackedStringArray = key.split("-")
@@ -54,43 +69,53 @@ func _ready() -> void:
 		lbl.text = str(st)
 		lbl.position = pos - Vector2(6, 12)
 		lbl.add_theme_color_override("font_color", Color(1, 1, 1, 0.9))
-		lbl.add_theme_font_size_override("font_size", 11)
-		add_child(lbl)
+		lbl.add_theme_font_size_override("font_size", 12)
+		_map_view.add_child(lbl)
 
 	# 玩家出生在第一关
 	var start_key: String = ProgressManager.stage_key(1, 1)
 	if start_key in _stage_positions:
 		_player_pos = _stage_positions[start_key]
 
-	# 设地图数据
-	_map_view.stage_positions = _stage_positions
 	_map_view.player_pos = _player_pos
 
 	_ready_done = true
-	_queue_map_redraw()
+	_update_camera()
+	_map_view.queue_redraw()
 
 
 func _process(delta: float) -> void:
 	if not _ready_done:
 		return
 
-	# WASD 自由移动
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	var vel: Vector2 = input * _move_speed
-	_player_pos += vel * delta
+	_player_pos += input * _move_speed * delta
 
-	# 更新 MapView
+	_player_pos.x = clamp(_player_pos.x, 0, _map_size.x)
+	_player_pos.y = clamp(_player_pos.y, 0, _map_size.y)
+
 	_map_view.player_pos = _player_pos
-
-	# 检测是否靠近圆点
+	_update_camera()
 	_check_dot_proximity()
+	_map_view.queue_redraw()
 
-	_queue_map_redraw()
+
+func _update_camera() -> void:
+	if _map_size.x <= 0 or _map_size.y <= 0:
+		return
+
+	var offset_x: float = _screen_size.x * 0.5 - _player_pos.x
+	var offset_y: float = _screen_size.y * 0.5 - _player_pos.y
+
+	offset_x = clamp(offset_x, _screen_size.x - _map_size.x, 0)
+	offset_y = clamp(offset_y, _screen_size.y - _map_size.y, 0)
+
+	_map_container.position = Vector2(offset_x, offset_y)
 
 
 func _check_dot_proximity() -> void:
 	var best_key: String = ""
-	var best_dist: float = 30.0  # 触发距离
+	var best_dist: float = 30.0
 
 	for key in _stage_positions:
 		if not ProgressManager.is_unlocked(
@@ -112,11 +137,6 @@ func _check_dot_proximity() -> void:
 		$BottomBar/EnterButton.hide()
 
 	_map_view.selected_key = _selected_key
-
-
-func _queue_map_redraw() -> void:
-	if _map_view:
-		_map_view.queue_redraw()
 
 
 func _on_back_pressed() -> void:
