@@ -21,6 +21,7 @@ AssetDB="*res://scripts/asset_db.gd"
 GameManager="*res://scripts/game_manager.gd"
 UpgradeManager="*res://scripts/upgrades/upgrade_manager.gd"
 ProgressManager="*res://scripts/progress_manager.gd"
+SaveManager="*res://scripts/save_manager.gd"
 
 [dotnet]
 

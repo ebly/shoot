@@ -29,7 +29,7 @@ func _process(delta: float) -> void:
 	global_position += direction * speed * delta
 
 
-const KNOCKBACK_PER_DAMAGE: float = 3.0   # 击退力 = 伤害 × 此系数
+const KNOCKBACK_PER_DAMAGE: float = 3.0   # 击退力基数 = 伤害 × 弹体大小 × 此系数
 
 
 func _on_hit(body: Node2D) -> void:
@@ -37,5 +37,7 @@ func _on_hit(body: Node2D) -> void:
 		if body.has_method("take_damage"):
 			body.take_damage(damage)
 		if body.has_method("apply_knockback"):
-			body.apply_knockback(direction.normalized(), damage * KNOCKBACK_PER_DAMAGE)
+			# 击退力受伤害和子弹大小共同影响
+			var size_mult: float = scale.x  # 子弹缩放反映大小倍率
+			body.apply_knockback(direction.normalized(), damage * size_mult * KNOCKBACK_PER_DAMAGE)
 		queue_free()

@@ -5,8 +5,10 @@ signal choices_ready(upgrades: Array)
 
 var _upgrade_pool: Array = []
 var _offered_ids: Array = []
-# 背包：upgrade_id → 已拾取次数（可用于 is_maxed 判断）
+# 背包：upgrade_id → 已拾取次数
 var backpack: Dictionary = {}
+# 已装备：upgrade_id → 已装备次数
+var equipped: Dictionary = {}
 
 
 func _ready() -> void:
@@ -39,6 +41,11 @@ func apply_upgrade(upgrade_id: String, player) -> void:
 	for u in _upgrade_pool:
 		if u.id == upgrade_id:
 			u.apply(player)
+			# 记录已装备
+			if equipped.has(upgrade_id):
+				equipped[upgrade_id] += 1
+			else:
+				equipped[upgrade_id] = 1
 			return
 	push_warning("UpgradeManager: 未知升级 id '%s'" % upgrade_id)
 
@@ -67,6 +74,21 @@ func get_backpack_count(upgrade_id: String) -> int:
 	return backpack.get(upgrade_id, 0)
 
 
+## 获取已装备的升级次数。
+func get_equipped_count(upgrade_id: String) -> int:
+	return equipped.get(upgrade_id, 0)
+
+
+## 获取已装备列表（供角色面板显示）。
+func get_equipped_list() -> Array:
+	var list: Array = []
+	for u in _upgrade_pool:
+		var cnt: int = get_equipped_count(u.id)
+		if cnt > 0:
+			list.append({"id": u.id, "count": cnt})
+	return list
+
+
 ## 背包是否为空。
 func is_backpack_empty() -> bool:
 	return backpack.is_empty()
@@ -75,7 +97,22 @@ func is_backpack_empty() -> bool:
 ## 重置背包（新游戏用）。
 func reset_backpack() -> void:
 	backpack.clear()
+	equipped.clear()
 	_offered_ids.clear()
+
+
+## 清除已装备（游戏结束返回地图时调用）。
+func clear_equipped() -> void:
+	equipped.clear()
+
+
+## 将全部已装备升级重新应用到玩家身上（进入新关卡时）。
+func reapply_equipped(player) -> void:
+	for u in _upgrade_pool:
+		var cnt: int = equipped.get(u.id, 0)
+		for _i in range(cnt):
+			u.apply(player)
+			u._applied_count -= 1  # 防重复计数
 
 
 ## 获取升级池（供背包面板遍历）。

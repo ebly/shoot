@@ -99,6 +99,7 @@ func unlock_slot() -> bool:
 	if not spend_gold(SLOT_UNLOCK_COST):
 		return false
 	unlocked_backpack_slots += 1
+	SaveManager.save_game()
 	return true
 
 
@@ -195,6 +196,26 @@ func reset() -> void:
 	is_stage_clear = false
 	between_waves = false
 	UpgradeManager.reset_backpack()
+	xp_changed.emit(0, xp_to_next())
+	game_started.emit()
+
+
+## 进入新关卡时重置（保留背包、金币、已装备）。
+func reset_for_new_stage() -> void:
+	score = 0
+	current_xp = 0
+	level = 1
+	survival_time = 0.0
+	is_game_over = false
+	enemies_killed = 0
+	total_waves = 3
+	current_wave = 1
+	wave_kills = 0
+	wave_target = WAVE_BASE
+	wave_active = true
+	is_stage_clear = false
+	between_waves = false
+	# 不重置：gold、backpack、equipped、unlocked_backpack_slots
 	xp_changed.emit(0, xp_to_next())
 	game_started.emit()
 

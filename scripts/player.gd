@@ -31,6 +31,9 @@ func _ready() -> void:
 	magnet_shape.radius = stats.magnet_radius
 	$MagnetArea/CollisionShape2D.shape = magnet_shape
 
+	# 重新应用已装备的升级（跨关卡继承）
+	UpgradeManager.reapply_equipped(self)
+
 	# default weapon
 	if weapons.is_empty():
 		add_default_weapon()
@@ -61,7 +64,15 @@ func _physics_process(delta: float) -> void:
 
 	# ── movement ──
 	var input_dir: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
-	velocity = input_dir * stats.move_speed
+	var speed: float = stats.move_speed
+	# 被僵尸撕咬时减速，按僵尸体型叠加
+	var grab_slow: float = 0.0
+	for e in get_tree().get_nodes_in_group("enemies"):
+		if is_instance_valid(e) and e.has_method("is_in_state") and e.is_in_state("grabbing"):
+			grab_slow = max(grab_slow, e.body_size * 0.3)
+	if grab_slow > 0.0:
+		speed *= 1.0 / (1.0 + grab_slow * 2.0)
+	velocity = input_dir * speed
 	move_and_slide()
 
 	# ── facing direction ──

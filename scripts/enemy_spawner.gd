@@ -27,6 +27,15 @@ var fast_zombie: Dictionary = {
 	"texture_key": "fast_enemy_texture",
 }
 
+var spitter_zombie: Dictionary = {
+	"max_hp": 15.0,
+	"speed": 70.0,
+	"grab_damage": 0,
+	"xp_value": 8,
+	"body_size": 0.7,
+	"texture_key": "spitter_texture",
+}
+
 
 func _ready() -> void:
 	spawn_timer = 0.3
@@ -66,8 +75,15 @@ func _spawn_one() -> void:
 		type = fast_zombie
 	if GameManager.current_wave >= 3 and randf() < 0.35:
 		type = fast_zombie
+	# 第3波起出现远程僵尸
+	if GameManager.current_wave >= 3 and randf() < 0.15:
+		type = spitter_zombie
 
 	e.set_enemy_type(type)
+
+	# 标记远程僵尸
+	if type.get("texture_key") == "spitter_texture":
+		e._is_spitter = true
 
 	# HP 随波次和时间缩放
 	var hp_mult: float = 1.0 + (GameManager.current_wave - 1) * 0.15 + time_elapsed * 0.005

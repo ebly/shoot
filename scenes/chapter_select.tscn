@@ -56,11 +56,25 @@ anchor_right = 0.5
 offset_left = -100.0
 offset_top = 10.0
 offset_right = 100.0
-offset_bottom = 40.0
+offset_bottom = 26.0
 text = ""
 horizontal_alignment = 1
 theme_override_colors/font_color = Color(0.9, 0.9, 0.95, 1)
 theme_override_font_sizes/font_size = 16
+
+[node name="BackPackButton" type="Button" parent="TopBar"]
+anchors_preset = 1
+anchor_left = 0.0
+anchor_right = 1.0
+offset_left = 12.0
+offset_top = 28.0
+offset_right = 12.0
+offset_bottom = 48.0
+text = ""
+disabled = true
+theme_override_colors/font_disabled_color = Color(0.9, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 12
+
 
 [node name="EnterButton" type="Button" parent="."]
 anchors_preset = 4

@@ -18,6 +18,8 @@ var _sprite_orig_scale: Vector2 = Vector2(2.0, 2.0)
 var _is_dead: bool = false
 var _knockback: Vector2 = Vector2.ZERO   # 击退速度
 var _stun_timer: float = 0.0              # 击退硬直计时
+var _is_spitter: bool = false             # 远程喷射僵尸
+var _spit_timer: float = 0.0
 const KNOCKBACK_DECAY: float = 30.0       # 击退衰减速度（高=快弹快停）
 
 
@@ -78,7 +80,31 @@ func _physics_process(delta: float) -> void:
 	var dist: float = dir_to_player.length()
 
 	if is_grabbing:
-		# ── GRABBING state ──
+		# ── SPITTER state ──
+	if _is_spitter:
+		_spit_timer -= delta
+		var ideal_dist: float = 180.0
+		if dist < ideal_dist * 0.6:
+			# 太近了，后退
+			velocity = -dir * speed
+		elif dist > ideal_dist * 1.4:
+			# 太远了，靠近
+			velocity = dir * speed
+		else:
+			velocity = Vector2.ZERO
+
+		if _stun_timer > 0.0:
+			velocity = _knockback
+
+		move_and_slide()
+
+		# 喷射毒液
+		if _spit_timer <= 0.0 and not _stun_timer > 0.0:
+			_spit_timer = 1.5 + randf() * 0.5
+			_spit_at_player()
+		return
+
+	# ── GRABBING state ──
 		# Stay close to the player
 		if dist > escape_range:
 			is_grabbing = false
@@ -136,6 +162,10 @@ func apply_knockback(dir: Vector2, power: float) -> void:
 		modulate = Color.WHITE
 
 
+func is_in_state(state: String) -> bool:
+	return state == "grabbing" and is_grabbing
+
+
 func die() -> void:
 	if _is_dead:
 		return
@@ -168,3 +198,13 @@ func _effects() -> Node:
 	if g:
 		return g
 	return get_node_or_null("/root/Main/EffectsManager")
+
+
+func _spit_at_player() -> void:
+	if player_ref == null:
+		return
+	var dir_to: Vector2 = (player_ref.global_position - global_position).normalized()
+	var spit: Area2D = load("res://scenes/spit_projectile.tscn").instantiate()
+	spit.global_position = global_position
+	spit.direction = dir_to
+	get_parent().add_child(spit)

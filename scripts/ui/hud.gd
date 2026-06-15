@@ -136,31 +136,28 @@ func _modulate_bar(bar: ProgressBar, color: Color) -> void:
 
 
 func _on_stage_clear() -> void:
-	stage_clear_panel.show()
-	$StageClearPanel/VBox/ClearScoreLabel.text = "得分: %d" % GameManager.score
-	get_tree().paused = true
-
-
-func _on_next_stage_pressed() -> void:
-	get_tree().paused = false
-	# 推进到下一关
-	var next_st: int = ProgressManager.current_stage + 1
-	var max_st: int = ProgressManager.STAGE_COUNTS[ProgressManager.current_chapter]
-	if next_st <= max_st:
-		ProgressManager.complete_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
-		ProgressManager.select_stage(ProgressManager.current_chapter, next_st)
-	else:
-		ProgressManager.complete_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
-	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
-
-
-func _on_map_pressed() -> void:
-	get_tree().paused = false
-	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
+	# 自动完成关卡并返回地图
+	ProgressManager.complete_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
+	SaveManager.save_game()
+	_go_to_map()
 
 
 func _on_restart_pressed() -> void:
-	GameManager.reset()
+	GameManager.reset_for_new_stage()
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
+
+
+func _on_gameover_map_pressed() -> void:
+	# 返回地图 — 清除已装备，保留背包和金币
+	UpgradeManager.clear_equipped()
+	GameManager.reset_for_new_stage()
+	SaveManager.save_game()
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
+
+
+func _go_to_map() -> void:
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/chapter_select.tscn")
 

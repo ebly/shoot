@@ -5,6 +5,7 @@ extends Node
 var player_texture: ImageTexture
 var enemy_texture: ImageTexture
 var fast_enemy_texture: ImageTexture
+var spitter_texture: ImageTexture
 var bullet_texture: ImageTexture
 var xp_orb_texture: ImageTexture
 var gold_coin_texture: ImageTexture
@@ -15,6 +16,7 @@ func _ready() -> void:
 	player_texture = _make_from_pattern(PLAYER_PATTERN, PLAYER_COLORS)
 	enemy_texture = _make_from_pattern(ENEMY_PATTERN, ENEMY_COLORS)
 	fast_enemy_texture = _make_from_pattern(FAST_ENEMY_PATTERN, FAST_ENEMY_COLORS)
+	spitter_texture = _make_from_pattern(SPITTER_PATTERN, SPITTER_COLORS)
 	bullet_texture = _make_dot(6, Color(1.0, 0.85, 0.2, 1.0))
 	xp_orb_texture = _make_from_pattern(XP_PATTERN, XP_COLORS)
 	gold_coin_texture = _make_dot(8, Color(1.0, 0.80, 0.10, 1.0))
@@ -25,6 +27,7 @@ func get_texture(key: String) -> ImageTexture:
 	match key:
 		"enemy_texture": return enemy_texture
 		"fast_enemy_texture": return fast_enemy_texture
+		"spitter_texture": return spitter_texture
 		"player_texture": return player_texture
 		"bullet_texture": return bullet_texture
 		"xp_orb_texture": return xp_orb_texture
@@ -111,6 +114,36 @@ const ENEMY_PATTERN: Array[String] = [
 	"...@....@.......",
 	"..@......@......",
 	".@........@.....",
+	"................",
+	"................",
+]
+
+
+# ── SPITTER ZOMBIE — 16×16 green spitter with boils ─────────────────────────
+
+const SPITTER_COLORS := {
+	"#": Color(0.35, 0.50, 0.20, 1.0),
+	"@": Color(0.55, 0.70, 0.30, 1.0),
+	"!": Color(0.95, 0.20, 0.10, 1.0),
+	"$": Color(0.60, 0.80, 0.20, 1.0),  # toxic spit
+	".": Color(0, 0, 0, 0),
+}
+
+const SPITTER_PATTERN: Array[String] = [
+	"................",
+	".....######.....",
+	"....##....##....",
+	"...#..$$..#.#...",
+	"...#!$..$!.#....",
+	"...##$$$$.##....",
+	"..$$....$$$.....",
+	".$$..##..$$......",
+	".$..####..$$....",
+	"..$$$$$$$.......",
+	"...##..##.......",
+	"...#....#.......",
+	"..#......#......",
+	".#........#.....",
 	"................",
 	"................",
 ]

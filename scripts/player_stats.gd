@@ -10,10 +10,11 @@ extends Resource
 @export var fire_rate_mult: float = 1.0
 @export var bullet_speed_mult: float = 1.0
 @export var bullet_size_mult: float = 1.0
-@export var extra_projectiles: int = 0
+@export var extra_projectiles: int = 1   # 弹道数（默认1发）
 @export var magnet_radius: float = 60.0
 @export var xp_mult: float = 1.0
-@export var body_size: float = 1.0   # 体型：越大越难被击退
+@export var body_size: float = 1.0
+@export var attack_range: float = 200.0  # 射程
 
 
 func reset() -> void:
@@ -25,7 +26,8 @@ func reset() -> void:
 	fire_rate_mult = 1.0
 	bullet_speed_mult = 1.0
 	bullet_size_mult = 1.0
-	extra_projectiles = 0
+	extra_projectiles = 1
 	magnet_radius = 60.0
 	xp_mult = 1.0
 	body_size = 1.0
+	attack_range = 200.0

@@ -58,7 +58,7 @@ func _fire(target_pos: Vector2) -> void:
 	if dir == Vector2.ZERO:
 		dir = Vector2.UP
 
-	var count: int = 1 + _extra_projectiles()
+	var count: int = _extra_projectiles()
 	var spread: float = 0.12  # radians between shots
 
 	for i in count:

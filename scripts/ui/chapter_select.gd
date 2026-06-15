@@ -14,6 +14,8 @@ var _scale: float = 1.0  # 地图缩放比例（填满屏幕）
 @onready var _map_view: Node2D = $MapContainer/MapView
 @onready var _map_bg: TextureRect = $MapContainer/MapBg
 @onready var _map_darken: ColorRect = $MapContainer/MapDarken
+@onready var _top_bar: ColorRect = $TopBar
+@onready var _info_button: Button = $TopBar/BackPackButton
 
 
 func _ready() -> void:
@@ -94,6 +96,13 @@ func _process(delta: float) -> void:
 	if not _ready_done:
 		return
 
+	# 更新顶部信息栏
+	var bp_count: int = 0
+	for u in UpgradeManager.get_upgrade_pool():
+		bp_count += UpgradeManager.get_backpack_count(u.id)
+	var unlocked: int = GameManager.unlocked_backpack_slots
+	_info_button.text = "💰 %d       🎒 %d/%d" % [GameManager.gold, min(bp_count, unlocked), unlocked]
+
 	var input: Vector2 = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	_player_pos += input * _move_speed * delta
 
@@ -162,4 +171,5 @@ func _on_enter_pressed() -> void:
 	var parts: PackedStringArray = _selected_key.split("-")
 	ProgressManager.current_chapter = int(parts[0])
 	ProgressManager.current_stage = int(parts[1])
+	GameManager.reset_for_new_stage()
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
