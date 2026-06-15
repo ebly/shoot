@@ -27,7 +27,6 @@ func _get_target_pos() -> Vector2:
 		return Vector2.ZERO
 
 	var player_pos: Vector2 = player.global_position
-	var max_range: float = player.stats.attack_range
 	var nearest: Node2D = null
 	var nearest_dist: float = INF
 
@@ -35,8 +34,6 @@ func _get_target_pos() -> Vector2:
 		if not is_instance_valid(e):
 			continue
 		var d: float = player_pos.distance_squared_to(e.global_position)
-		if d > max_range * max_range:
-			continue
 		if d < nearest_dist:
 			nearest_dist = d
 			nearest = e

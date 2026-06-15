@@ -67,6 +67,7 @@ func _fire(target_pos: Vector2) -> void:
 		b.speed = _effective_bullet_speed()
 		b.global_position = player.global_position
 		b.scale = Vector2.ONE * _effective_bullet_scale()
+		b.max_range = player.stats.attack_range
 
 		if count > 1:
 			var offset_angle: float = (i - (count - 1) * 0.5) * spread

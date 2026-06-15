@@ -4,7 +4,9 @@ extends Area2D
 var direction: Vector2 = Vector2.UP
 var speed: float = 400.0
 var damage: float = 15.0
-var lifetime: float = 3.0
+var max_range: float = 200.0  # 最大飞行距离（受射程影响）
+
+var _traveled: float = 0.0
 
 
 func _ready() -> void:
@@ -21,12 +23,13 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	lifetime -= delta
-	if lifetime <= 0.0:
+	var step: float = speed * delta
+	_traveled += step
+	if _traveled >= max_range:
 		queue_free()
 		return
 
-	global_position += direction * speed * delta
+	global_position += direction * step
 
 
 const KNOCKBACK_PER_DAMAGE: float = 3.0   # 击退力基数 = 伤害 × 弹体大小 × 此系数
