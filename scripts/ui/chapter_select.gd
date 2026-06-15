@@ -22,6 +22,7 @@ func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	$TopBar/TitleLabel.hide()
 	$EnterButton.hide()
+	$ShopButton.show()
 
 	_screen_size = get_viewport_rect().size
 
@@ -163,6 +164,13 @@ func _check_dot_proximity() -> void:
 
 func _on_back_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+
+
+func _on_shop_pressed() -> void:
+	var shop_scene: PackedScene = preload("res://scenes/shop_panel.tscn")
+	var shop = shop_scene.instantiate()
+	add_child(shop)
+	shop.closed.connect(func(): shop.queue_free())
 
 
 func _on_enter_pressed() -> void:

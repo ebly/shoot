@@ -34,6 +34,19 @@ func _ready() -> void:
 	# 重新应用已装备的升级（跨关卡继承）
 	UpgradeManager.reapply_equipped(self)
 
+	# 应用商店购买的临时增益
+	var buffs: Dictionary = GameManager.shop_buffs
+	if not buffs.is_empty():
+		for key in buffs:
+			var val = buffs[key]
+			match key:
+				"buff_damage": stats.damage_mult += val
+				"buff_speed":   stats.move_speed += val
+				"buff_hp":      stats.max_hp += val; stats.hp += val
+				"buff_xp":      stats.xp_mult += val
+		# 用完清除
+		GameManager.shop_buffs.clear()
+
 	# default weapon
 	if weapons.is_empty():
 		add_default_weapon()

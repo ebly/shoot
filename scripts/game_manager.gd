@@ -34,6 +34,9 @@ var wave_active: bool = true      # 当前波是否仍在生成僵尸
 var is_stage_clear: bool = false  # 全部波次完成
 var between_waves: bool = false   # 波次间隙
 
+# 商店购买的临时增益
+var shop_buffs: Dictionary = {}
+
 const WAVE_BASE: int = 15
 const WAVE_INCREMENT: int = 5
 
@@ -195,6 +198,7 @@ func reset() -> void:
 	wave_active = true
 	is_stage_clear = false
 	between_waves = false
+	shop_buffs.clear()
 	UpgradeManager.reset_backpack()
 	xp_changed.emit(0, xp_to_next())
 	game_started.emit()
