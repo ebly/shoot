@@ -85,7 +85,7 @@ func _physics_process(delta: float) -> void:
 		var ideal_dist: float = 180.0
 		if dist < ideal_dist * 0.6:
 			velocity = -dir_to_player.normalized() * speed
-		elif dist > ideal_dist * 1.4:
+		elif distaw > ideal_dist * 1.4:
 			velocity = dir_to_player.normalized() * speed
 		else:
 			velocity = Vector2.ZERO

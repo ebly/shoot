@@ -172,7 +172,15 @@ func _on_shop_pressed() -> void:
 	var shop_scene: PackedScene = preload("res://scenes/shop_panel.tscn")
 	var shop = shop_scene.instantiate()
 	add_child(shop)
-	shop.closed.connect(func(): shop.queue_free())
+	shop.closed.connect(func():
+		shop.queue_free()
+		$ShopButton.show()
+		# 重新检查附近关卡来决定是否显示进入按钮
+		_check_dot_proximity()
+	)
+	# 隐藏选关按钮避免重叠
+	$ShopButton.hide()
+	$EnterButton.hide()
 
 
 func _on_enter_pressed() -> void:

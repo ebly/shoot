@@ -72,18 +72,15 @@ func _on_buy_pressed(item: Dictionary) -> void:
 	# 临时Buff — 存入 GameManager 供下一关使用
 	if GameManager.gold >= item["cost"]:
 		GameManager.spend_gold(item["cost"])
-		# 用偏移量形式记录 buff，进入关卡时应用
-		if not GameManager.has("shop_buffs"):
-			GameManager.set("shop_buffs", {})
-		var buffs = GameManager.get("shop_buffs")
-		if buffs == null:
-			buffs = {}
-		buffs[item["type"]] = buffs.get(item["type"], 0) + item["effect"]
-		GameManager.set("shop_buffs", buffs)
+		var buffs: Dictionary = GameManager.shop_buffs
+		if buffs.has(item["type"]):
+			buffs[item["type"]] += item["effect"]
+		else:
+			buffs[item["type"]] = item["effect"]
+		GameManager.shop_buffs = buffs
 		SaveManager.save_game()
 		_refresh()
 
 
 func _on_close_pressed() -> void:
 	closed.emit()
-	queue_free()
