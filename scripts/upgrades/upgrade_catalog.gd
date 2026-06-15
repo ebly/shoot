@@ -15,6 +15,7 @@ static func all() -> Array[UpgradeResource]:
 	list.append(_make(UpgradeResource.MultiShotUp.new(),   "multishot",    "双持",             "弹道 +1",                   3))
 	list.append(_make(UpgradeResource.MagnetUp.new(),      "magnet",       "生存直觉",         "拾取范围 +40",             5))
 	list.append(_make(UpgradeResource.XpBoostUp.new(),     "xp_boost",     "狩猎经验",         "经验获取 +20%",             5))
+	list.append(_make(UpgradeResource.RangeUp.new(),       "range",        "瞄准镜",           "射程 +40",                  5))
 
 	return list
 

@@ -9,6 +9,7 @@ const BASE_STATS: Dictionary = {
 	"max_hp":            {"label": "生命",   "base": 100.0, "suffix": ""},
 	"hp_regen":          {"label": "恢复",   "base": 0.5,   "suffix": "/秒"},
 	"move_speed":        {"label": "移速",   "base": 280.0, "suffix": ""},
+	"attack_range":      {"label": "射程",   "base": 200.0, "suffix": ""},
 	"damage_mult":       {"label": "伤害",   "base": 1.0,   "suffix": "×"},
 	"fire_rate_mult":    {"label": "射速",   "base": 1.0,   "suffix": "×"},
 	"extra_projectiles": {"label": "弹道",   "base": 1,     "suffix": ""},

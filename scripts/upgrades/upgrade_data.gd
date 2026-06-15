@@ -63,3 +63,8 @@ class MagnetUp extends UpgradeResource:
 class XpBoostUp extends UpgradeResource:
 	func _do_apply(player) -> void:
 		player.stats.xp_mult += 0.2
+
+
+class RangeUp extends UpgradeResource:
+	func _do_apply(player) -> void:
+		player.stats.attack_range += 40
