@@ -79,17 +79,14 @@ func _physics_process(delta: float) -> void:
 	var dir_to_player: Vector2 = player_ref.global_position - global_position
 	var dist: float = dir_to_player.length()
 
-	if is_grabbing:
-		# ── SPITTER state ──
+	# ── SPITTER state ──
 	if _is_spitter:
 		_spit_timer -= delta
 		var ideal_dist: float = 180.0
 		if dist < ideal_dist * 0.6:
-			# 太近了，后退
-			velocity = -dir * speed
+			velocity = -dir_to_player.normalized() * speed
 		elif dist > ideal_dist * 1.4:
-			# 太远了，靠近
-			velocity = dir * speed
+			velocity = dir_to_player.normalized() * speed
 		else:
 			velocity = Vector2.ZERO
 
@@ -98,13 +95,13 @@ func _physics_process(delta: float) -> void:
 
 		move_and_slide()
 
-		# 喷射毒液
 		if _spit_timer <= 0.0 and not _stun_timer > 0.0:
 			_spit_timer = 1.5 + randf() * 0.5
 			_spit_at_player()
 		return
 
 	# ── GRABBING state ──
+	if is_grabbing:
 		# Stay close to the player
 		if dist > escape_range:
 			is_grabbing = false

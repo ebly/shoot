@@ -69,15 +69,12 @@ func _spawn_one() -> void:
 	var e = enemy_scene.instantiate()
 	e.global_position = _random_edge_pos()
 
-	# 根据波次和存活时间决定类型
+	# 波次决定僵尸类型
 	var type: Dictionary = basic_zombie
-	if GameManager.current_wave >= 2 and randf() < 0.2:
-		type = fast_zombie
-	if GameManager.current_wave >= 3 and randf() < 0.35:
-		type = fast_zombie
-	# 第3波起出现远程僵尸
-	if GameManager.current_wave >= 3 and randf() < 0.15:
-		type = spitter_zombie
+	match GameManager.current_wave:
+		1: type = basic_zombie
+		2: type = fast_zombie
+		3: type = spitter_zombie
 
 	e.set_enemy_type(type)
 

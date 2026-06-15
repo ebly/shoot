@@ -33,6 +33,6 @@ func _on_hit(body: Node2D) -> void:
 		if body.has_method("take_damage"):
 			body.take_damage(damage)
 		queue_free()
-	# 不击中敌人，只击中玩家
-	elif not body.is_in_group("enemies"):
-		queue_free()  # 撞墙消失
+	# 不击中敌人，只击中玩家；撞墙消失
+	if not body.is_in_group("enemies") and not body.is_in_group("player"):
+		queue_free()
