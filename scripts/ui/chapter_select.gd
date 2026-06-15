@@ -22,7 +22,7 @@ func _ready() -> void:
 	process_mode = PROCESS_MODE_ALWAYS
 	$TopBar/TitleLabel.hide()
 	$EnterButton.hide()
-	$ShopButton.show()
+	$ShopButton.hide()
 
 	_screen_size = get_viewport_rect().size
 
@@ -154,10 +154,12 @@ func _check_dot_proximity() -> void:
 		$TopBar/TitleLabel.show()
 		$TopBar/TitleLabel.text = "第%s章 · 第%s关" % [parts[0], parts[1]]
 		$EnterButton.show()
+		$ShopButton.show()
 	elif best_key == "" and _selected_key != "":
 		_selected_key = ""
 		$TopBar/TitleLabel.hide()
 		$EnterButton.hide()
+		$ShopButton.hide()
 
 	_map_view.selected_key = _selected_key
 

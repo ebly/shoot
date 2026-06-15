@@ -76,7 +76,7 @@ theme_override_colors/font_disabled_color = Color(0.9, 0.9, 0.3, 1)
 theme_override_font_sizes/font_size = 12
 
 
-[node name="EnterButton" type="Button" parent="."]
+[node name="ShopButton" type="Button" parent="."]
 anchors_preset = 4
 anchor_left = 1.0
 anchor_top = 1.0
@@ -86,12 +86,12 @@ offset_left = -170.0
 offset_top = -130.0
 offset_right = -20.0
 offset_bottom = -80.0
-text = "进 入 游 戏"
-theme_override_font_sizes/font_size = 20
+text = "商  店"
+theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_styles/normal = SubResource("enter_bg")
 
-[node name="ShopButton" type="Button" parent="."]
+[node name="EnterButton" type="Button" parent="."]
 anchors_preset = 4
 anchor_left = 1.0
 anchor_top = 1.0
@@ -101,8 +101,10 @@ offset_left = -170.0
 offset_top = -70.0
 offset_right = -20.0
 offset_bottom = -20.0
-text = "商  店"
-theme_override_font_sizes/font_size = 18
+text = "进 入 游 戏"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_styles/normal = SubResource("enter_bg")
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_styles/normal = SubResource("enter_bg")
 
