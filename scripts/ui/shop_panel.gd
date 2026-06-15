@@ -21,8 +21,8 @@ func _refresh() -> void:
 		{"name": "背包扩容卡", "desc": "永久+1背包格",    "cost": 80, "type": "slot_unlock",  "effect": 1},
 	]
 
-	# 清空旧商品
-	var container: VBoxContainer = $VBox/Scroll/Grid
+	# 清空商品
+	var container: VBoxContainer = $CenterPanel/VBox/Scroll/Grid
 	for c in container.get_children():
 		c.queue_free()
 
@@ -57,7 +57,7 @@ func _refresh() -> void:
 		row.add_child(buy_btn)
 
 	# 顶部金币
-	$VBox/GoldLabel.text = "💰 金币: %d" % GameManager.gold
+	$CenterPanel/VBox/GoldLabel.text = "💰 金币: %d" % GameManager.gold
 
 
 func _on_buy_pressed(item: Dictionary) -> void:
