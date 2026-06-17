@@ -46,7 +46,7 @@ const RAW: Dictionary = {
 		_is_spitter = true,
 	},
 	boss = {
-		id = "boss", name = "BOSS僵尸", max_hp = 30000.0, speed = 60.0,
+		id = "boss", name = "BOSS僵尸", max_hp = 300.0, speed = 60.0,
 		grab_damage = 15.0, xp_value = 50, body_size = 3.0, texture_key = "boss_texture",
 		_is_boss = true,
 	},

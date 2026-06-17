@@ -1,11 +1,11 @@
-extends Area2D
+extends CharacterBody2D
 ## Bullet — flies in a direction, damages the first enemy it hits, self-destructs.
 
 var direction: Vector2 = Vector2.UP
 var speed: float = 400.0
 var damage: float = 15.0
 
-var _lifetime: float = ConfigData.BULLET.lifetime
+const KNOCKBACK_PER_DAMAGE: float = ConfigData.BULLET.knockback_per_damage
 
 
 func _ready() -> void:
@@ -16,10 +16,8 @@ func _ready() -> void:
 	$Sprite2D.texture = AssetDB.bullet_texture
 	$Sprite2D.scale = Vector2(1.0, 1.0)
 
-	body_entered.connect(_on_hit)
 
-
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	# 飞出屏幕即销毁
 	var cam: Camera2D = get_viewport().get_camera_2d()
 	if cam:
@@ -30,19 +28,14 @@ func _process(delta: float) -> void:
 		if not world_rect.has_point(global_position):
 			queue_free()
 			return
-	var step: float = speed * delta
-	global_position += direction * step
-
-
-const KNOCKBACK_PER_DAMAGE: float = ConfigData.BULLET.knockback_per_damage   # 击退力基数 = 伤害 × 弹体大小 × 此系数
-
-
-func _on_hit(body: Node2D) -> void:
-	if body.is_in_group("enemies"):
-		if body.has_method("take_damage"):
-			body.take_damage(damage)
-		if body.has_method("apply_knockback"):
-			# 击退力受伤害和子弹大小共同影响
-			var size_mult: float = scale.x  # 子弹缩放反映大小倍率
-			body.apply_knockback(direction.normalized(), damage * size_mult * KNOCKBACK_PER_DAMAGE)
+	# 移动并检测碰撞
+	var collision: KinematicCollision2D = move_and_collide(direction * speed * delta)
+	if collision:
+		var body: Node = collision.get_collider()
+		if body and body.is_in_group("enemies"):
+			if body.has_method("take_damage"):
+				body.take_damage(damage)
+			if body.has_method("apply_knockback"):
+				var size_mult: float = scale.x
+				body.apply_knockback(direction.normalized(), damage * size_mult * KNOCKBACK_PER_DAMAGE)
 		queue_free()

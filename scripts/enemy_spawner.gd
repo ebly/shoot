@@ -19,6 +19,20 @@ func _process(delta: float) -> void:
 	if GameManager.is_game_over or GameManager.is_stage_clear:
 		return
 
+	# 当前波次信息
+	var waves: Array = ProgressManager.get_stage_waves(_ch(), _st())
+	var wave_count: int = waves.size()
+
+	# 空配置 → 没有波次，直接标记生成结束
+	if wave_count == 0:
+		_all_waves_done = true
+		GameManager.wave_active = false
+		GameManager.spawn_phase_over = true
+		# kill_all 且无待出 boss → 直接过关
+		if GameManager.stage_mode == "kill_all" and not GameManager.boss_pending:
+			GameManager.complete_stage()
+		return
+
 	# ── Boss 生成（普通波次全部出完后） ──
 	if _all_waves_done and not _boss_spawned:
 		var boss_id = ProgressManager.get_stage_config(_ch(), _st(), "boss", "")
@@ -38,8 +52,6 @@ func _process(delta: float) -> void:
 
 	# 当前波次信息
 	var wave: int = GameManager.current_wave
-	var waves: Array = ProgressManager.get_stage_waves(_ch(), _st())
-	var wave_count: int = waves.size()
 
 	if wave > wave_count:
 		return

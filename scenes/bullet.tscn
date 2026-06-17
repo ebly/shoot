@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/bullet.gd" id="1_bullet"]
 
-[node name="Bullet" type="Area2D"]
+[node name="Bullet" type="CharacterBody2D"]
 collision_layer = 0
 collision_mask = 4
 script = ExtResource("1_bullet")

@@ -95,7 +95,7 @@ func get_stage_waves(chapter: int, stage: int) -> Array:
 		var val = script.waves
 		if typeof(val) == TYPE_ARRAY:
 			return val
-	return [{zombie = "basic", interval = 1.2, hp_mult = 1.0, count = 10}, {zombie = "fast", interval = 0.8, hp_mult = 1.2, count = 12}, {zombie = "spitter", interval = 0.5, hp_mult = 1.5, count = 15}]
+	return []
 
 
 ## 获取关卡级配置常量（如 spawn_stage_ratio）。

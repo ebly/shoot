@@ -56,7 +56,7 @@ func xp_to_next() -> int:
 
 
 func gain_xp(amount: int) -> void:
-	if is_game_over:
+	if is_game_over or is_stage_clear:
 		return
 	current_xp += amount
 	xp_gained.emit(amount)
@@ -120,7 +120,7 @@ func on_enemy_killed() -> void:
 		if boss_pending:
 			boss_pending = false
 			return
-		_complete_stage()
+		complete_stage()
 
 
 ## 进入新关卡时初始化。
@@ -162,10 +162,10 @@ func trigger_game_over() -> void:
 
 func _check_survive_complete() -> void:
 	if stage_mode == "survive" and not is_stage_clear and survival_time >= stage_duration:
-		_complete_stage()
+		complete_stage()
 
 
-func _complete_stage() -> void:
+func complete_stage() -> void:
 	is_stage_clear = true
 	wave_active = false
 	stage_complete.emit()
@@ -247,7 +247,7 @@ func _on_spawn_phase_end() -> void:
 		if boss_pending:
 			boss_pending = false
 		else:
-			_complete_stage()
+			complete_stage()
 
 
 func _setup_input_actions() -> void:

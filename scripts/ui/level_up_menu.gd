@@ -2,6 +2,8 @@ extends CanvasLayer
 ## 升级菜单 — 升级时出现，选择「拾取→背包」或「装备→角色」。
 
 @onready var card_container: HBoxContainer = $Panel/CardContainer
+@onready var refresh_button: Button = $Panel/RefreshHBox/RefreshButton
+@onready var refresh_cost_label: Label = $Panel/RefreshHBox/RefreshCostLabel
 @onready var card_scene: PackedScene = preload("res://scenes/upgrade_card.tscn")
 
 var _current_choices: Array = []
@@ -12,10 +14,13 @@ func _ready() -> void:
 	process_mode = PROCESS_MODE_WHEN_PAUSED
 	hide()
 	GameManager.level_up.connect(_on_level_up)
+	refresh_button.pressed.connect(_refresh_pressed)
 
 
 func _on_level_up(_new_level: int) -> void:
-	_effects().freeze(0.06)
+	var fx = _effects()
+	if fx:
+		fx.freeze(0.06)
 	if _is_showing:
 		call_deferred("_show_choices")
 		return
@@ -40,6 +45,7 @@ func _show_choices() -> void:
 	show()
 	_is_showing = true
 	get_tree().paused = true
+	_update_refresh_button()
 
 
 ## 拾取 → 存入背包，不生效。
@@ -56,6 +62,16 @@ func _on_equipped(upgrade_id: String) -> void:
 	_close()
 
 
+func _refresh_pressed() -> void:
+	if GameManager.spend_gold(5):
+		_show_choices()
+
+
+func _update_refresh_button() -> void:
+	refresh_button.disabled = GameManager.gold < 5
+	refresh_cost_label.text = "🪙 5"
+
+
 func _close() -> void:
 	_is_showing = false
 	get_tree().paused = false
@@ -70,4 +86,9 @@ func _find_player():
 
 
 func _effects() -> Node:
+	var tree := get_tree()
+	if tree:
+		var g: Node = tree.get_first_node_in_group("effects")
+		if g:
+			return g
 	return get_node_or_null("/root/Main/EffectsManager")
