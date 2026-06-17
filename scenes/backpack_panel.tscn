@@ -7,29 +7,29 @@
 layer = 90
 script = ExtResource("1_bp")
 
-[node name="ColorRect" type="ColorRect" parent="."]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.55)
-
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -380.0
-offset_top = -290.0
-offset_right = 380.0
-offset_bottom = 290.0
+offset_left = -460.0
+offset_top = -310.0
+offset_right = 460.0
+offset_bottom = 310.0
+
+[node name="ColorBg" type="ColorRect" parent="Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.12, 0.10, 0.15, 1)
 
 [node name="TitleLabel" type="Label" parent="Panel"]
 anchors_preset = 2
 anchor_top = 0.0
 anchor_right = 1.0
-offset_top = 10.0
-offset_bottom = 38.0
+offset_top = 8.0
+offset_bottom = 36.0
 text = "背  包"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 18
@@ -38,86 +38,58 @@ theme_override_font_sizes/font_size = 18
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 42.0
-offset_right = -8.0
-offset_bottom = -8.0
-theme_override_constants/separation = 8
-
-[node name="CharacterPanel" type="Panel" parent="Panel/MainHBox"]
-custom_minimum_size = Vector2(64, 0)
-
-[node name="CharVBox" type="VBoxContainer" parent="Panel/MainHBox/CharacterPanel"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 4.0
-offset_top = 4.0
-offset_right = -4.0
-offset_bottom = -4.0
+offset_left = 6.0
+offset_top = 38.0
+offset_right = -6.0
+offset_bottom = -6.0
 theme_override_constants/separation = 6
 
-[node name="DetailPanel" type="Panel" parent="Panel/MainHBox"]
-size_flags_horizontal = 3
+[node name="LeftEquipVBox" type="VBoxContainer" parent="Panel/MainHBox"]
+size_flags_horizontal = 0
 
-[node name="DetailVBox" type="VBoxContainer" parent="Panel/MainHBox/DetailPanel"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 8.0
-offset_right = -8.0
-offset_bottom = -8.0
+[node name="CenterVBox" type="VBoxContainer" parent="Panel/MainHBox"]
+size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="CharNameLabel" type="Label" parent="Panel/MainHBox/DetailPanel/DetailVBox"]
-text = "幸存者"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 14
+[node name="PortraitRect" type="TextureRect" parent="Panel/MainHBox/CenterVBox"]
+custom_minimum_size = Vector2(140, 140)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
 
-[node name="StatsLabel" type="RichTextLabel" parent="Panel/MainHBox/DetailPanel/DetailVBox"]
+[node name="StatsLabel" type="RichTextLabel" parent="Panel/MainHBox/CenterVBox"]
 bbcode_enabled = true
 fit_content = true
 scroll_active = false
-size_flags_vertical = 0
+size_flags_vertical = 3
 theme_override_font_sizes/normal_font_size = 11
 
-[node name="EquipTitle" type="Label" parent="Panel/MainHBox/DetailPanel/DetailVBox"]
-text = "— 已装备 —"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 12
+[node name="RightEquipVBox" type="VBoxContainer" parent="Panel/MainHBox"]
+size_flags_horizontal = 0
 
-[node name="EquipGrid" type="GridContainer" parent="Panel/MainHBox/DetailPanel/DetailVBox"]
-columns = 5
-size_flags_vertical = 3
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
+[node name="BackpackVBox" type="VBoxContainer" parent="Panel/MainHBox"]
+size_flags_horizontal = 4
+theme_override_constants/separation = 6
 
-[node name="RightVBox" type="VBoxContainer" parent="Panel/MainHBox"]
-size_flags_horizontal = 3
-theme_override_constants/separation = 8
-
-[node name="GridContainer" type="GridContainer" parent="Panel/MainHBox/RightVBox"]
+[node name="GridContainer" type="GridContainer" parent="Panel/MainHBox/BackpackVBox"]
 columns = 5
 size_flags_vertical = 3
 theme_override_constants/h_separation = 6
 theme_override_constants/v_separation = 6
 
-[node name="BottomBar" type="HBoxContainer" parent="Panel/MainHBox/RightVBox"]
+[node name="BottomBar" type="HBoxContainer" parent="Panel/MainHBox/BackpackVBox"]
 size_flags_vertical = 0
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 
-[node name="GoldLabel" type="Label" parent="Panel/MainHBox/RightVBox/BottomBar"]
+[node name="GoldLabel" type="Label" parent="Panel/MainHBox/BackpackVBox/BottomBar"]
 text = "💰 金币: 0"
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 
-[node name="UnlockHint" type="Label" parent="Panel/MainHBox/RightVBox/BottomBar"]
-text = "点击🔒格子花费50金币解锁"
-theme_override_font_sizes/font_size = 11
-
-[node name="CloseButton" type="Button" parent="Panel/MainHBox/RightVBox"]
+[node name="CloseButton" type="Button" parent="Panel/MainHBox/BackpackVBox"]
 text = "关  闭"
 theme_override_font_sizes/font_size = 14
+size_flags_vertical = 0
 
-[connection signal="pressed" from="Panel/MainHBox/RightVBox/CloseButton" to="." method="_on_close_pressed"]
+[connection signal="pressed" from="Panel/MainHBox/BackpackVBox/CloseButton" to="." method="_on_close_pressed"]

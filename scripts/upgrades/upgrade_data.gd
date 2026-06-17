@@ -65,6 +65,3 @@ class XpBoostUp extends UpgradeResource:
 		player.stats.xp_mult += 0.2
 
 
-class RangeUp extends UpgradeResource:
-	func _do_apply(player) -> void:
-		player.stats.attack_range += 40

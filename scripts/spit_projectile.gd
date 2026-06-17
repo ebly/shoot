@@ -13,18 +13,24 @@ func _ready() -> void:
 	$CollisionShape2D.shape = shape
 
 	var sprite: Sprite2D = $Sprite2D
-	sprite.texture = AssetDB.bullet_texture
-	sprite.scale = Vector2(2.0, 2.0)
+	sprite.texture = AssetDB.spit_texture
+	sprite.scale = Vector2(1.0, 1.0)
 	sprite.modulate = Color(0.4, 0.85, 0.25, 1.0)  # 绿色毒液
 
 	body_entered.connect(_on_hit)
 
 
 func _process(delta: float) -> void:
-	lifetime -= delta
-	if lifetime <= 0.0:
-		queue_free()
-		return
+	# 出屏幕即销毁
+	var cam: Camera2D = get_viewport().get_camera_2d()
+	if cam:
+		var vp: Rect2 = get_viewport_rect()
+		var cam_pos: Vector2 = cam.global_position
+		var margin: float = 80.0
+		var world_rect: Rect2 = Rect2(cam_pos.x - vp.size.x * 0.5 - margin, cam_pos.y - vp.size.y * 0.5 - margin, vp.size.x + margin * 2, vp.size.y + margin * 2)
+		if not world_rect.has_point(global_position):
+			queue_free()
+			return
 	global_position += direction * speed * delta
 
 

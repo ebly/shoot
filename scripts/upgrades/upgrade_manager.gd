@@ -106,6 +106,25 @@ func clear_equipped() -> void:
 	equipped.clear()
 
 
+## 从装备栏卸下到背包。
+func unequip(upgrade_id: String) -> void:
+	if not equipped.has(upgrade_id) or equipped[upgrade_id] <= 0:
+		return
+	equipped[upgrade_id] -= 1
+	if equipped[upgrade_id] <= 0:
+		equipped.erase(upgrade_id)
+	store_in_backpack(upgrade_id)
+
+
+## 从背包丢弃（彻底删除）。
+func discard(upgrade_id: String) -> void:
+	if not backpack.has(upgrade_id) or backpack[upgrade_id] <= 0:
+		return
+	backpack[upgrade_id] -= 1
+	if backpack[upgrade_id] <= 0:
+		backpack.erase(upgrade_id)
+
+
 ## 将全部已装备升级重新应用到玩家身上（进入新关卡时）。
 func reapply_equipped(player) -> void:
 	for u in _upgrade_pool:

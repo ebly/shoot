@@ -19,6 +19,7 @@ var _is_dead: bool = false
 var _knockback: Vector2 = Vector2.ZERO   # 击退速度
 var _stun_timer: float = 0.0              # 击退硬直计时
 var _is_spitter: bool = false             # 远程喷射僵尸
+var _is_boss: bool = false                # BOSS僵尸
 var _spit_timer: float = 0.0
 const KNOCKBACK_DECAY: float = 30.0       # 击退衰减速度（高=快弹快停）
 
@@ -40,6 +41,35 @@ func _ready() -> void:
 	$Hitbox/CollisionShape2D.shape = hb_shape
 
 	_resolve_player()
+
+	# Boss 入场：直接显示
+	if _is_boss:
+		$Sprite2D.scale = _sprite_orig_scale * 3.0
+		_setup_boss_hp_bar()
+
+
+func _setup_boss_hp_bar() -> void:
+	# Boss 血条（头顶）
+	var bar_bg: ColorRect = ColorRect.new()
+	bar_bg.name = "BossHPBg"
+	bar_bg.size = Vector2(80, 8)
+	bar_bg.position = Vector2(-40, -40)
+	bar_bg.color = Color(0.2, 0.05, 0.05, 0.8)
+	add_child(bar_bg)
+
+	var bar_fg: ColorRect = ColorRect.new()
+	bar_fg.name = "BossHPFg"
+	bar_fg.size = Vector2(80, 8)
+	bar_fg.position = Vector2(-40, -40)
+	bar_fg.color = Color(0.9, 0.15, 0.1, 1.0)
+	add_child(bar_fg)
+
+
+func _update_boss_hp() -> void:
+	var fg: ColorRect = get_node_or_null("BossHPFg")
+	if fg:
+		var ratio: float = max(0, hp / max_hp)
+		fg.size.x = 80 * ratio
 
 
 func set_enemy_type(type_data: Dictionary) -> void:
@@ -85,7 +115,7 @@ func _physics_process(delta: float) -> void:
 		var ideal_dist: float = 180.0
 		if dist < ideal_dist * 0.6:
 			velocity = -dir_to_player.normalized() * speed
-		elif distaw > ideal_dist * 1.4:
+		elif dist > ideal_dist * 1.4:
 			velocity = dir_to_player.normalized() * speed
 		else:
 			velocity = Vector2.ZERO
@@ -142,6 +172,14 @@ func take_damage(amount: float) -> void:
 	if _is_dead:
 		return
 	hp -= amount
+
+	# 伤害数字
+	_spawn_damage_number(int(amount))
+
+	# Boss 血条更新
+	if _is_boss:
+		_update_boss_hp()
+
 	if hp <= 0.0:
 		die()
 
@@ -183,6 +221,21 @@ func _spawn_gold_coin() -> void:
 	coin.global_position = global_position
 	coin.gold_amount = randi_range(1, 3)
 	get_parent().add_child(coin)
+
+
+func _spawn_damage_number(dmg: int) -> void:
+	var lbl: Label = Label.new()
+	lbl.text = "-%d" % dmg
+	lbl.add_theme_color_override("font_color", Color(1, 0.85, 0.1, 1))
+	lbl.add_theme_font_size_override("font_size", 16)
+	lbl.position = Vector2(randf_range(-15, 15), randf_range(-35, -20))
+	add_child(lbl)
+
+	var tween: Tween = create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(lbl, "position:y", lbl.position.y - 30, 0.6)
+	tween.tween_property(lbl, "modulate:a", 0.0, 0.6)
+	tween.chain().tween_callback(lbl.queue_free)
 
 
 func _on_hitbox_body_entered(body: Node2D) -> void:

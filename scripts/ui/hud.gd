@@ -28,13 +28,12 @@ func _ready() -> void:
 	GameManager.gold_changed.connect(_on_gold_changed)
 	GameManager.wave_changed.connect(_on_wave_changed)
 	GameManager.stage_complete.connect(_on_stage_clear)
+	GameManager.enemies_remaining_changed.connect(_on_enemies_remaining_changed)
 	game_over_panel.hide()
 	stage_clear_panel.hide()
 	_on_gold_changed(GameManager.gold)
-	# 初始化三波目标值
-	wave_bars[0].max_value = 15
-	wave_bars[1].max_value = 20
-	wave_bars[2].max_value = 25
+	# 初始化关卡（game_started 在场景切换前发射，HUD 还没就绪）
+	GameManager.setup_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
 	_init_wave_display()
 
 
@@ -42,9 +41,17 @@ func _process(_delta: float) -> void:
 	if GameManager.is_game_over or GameManager.is_stage_clear:
 		return
 	var t: float = GameManager.survival_time
-	var mins: int = int(t) / 60
-	var secs: int = int(t) % 60
-	timer_label.text = "%02d:%02d" % [mins, secs]
+
+	# 显示模式相关
+	if GameManager.stage_mode == "survive":
+		var remain: float = max(0, GameManager.stage_duration - t)
+		var mins: int = int(remain) / 60
+		var secs: int = int(remain) % 60
+		timer_label.text = "剩余 %02d:%02d" % [mins, secs]
+	else:
+		var mins: int = int(t) / 60
+		var secs: int = int(t) % 60
+		timer_label.text = "%02d:%02d" % [mins, secs]
 	enemies_label.text = "击杀: %d" % GameManager.enemies_killed
 
 	var player = _find_player()
@@ -68,6 +75,7 @@ func _on_game_over(_time: float, _score: int) -> void:
 
 
 func _on_game_started() -> void:
+	GameManager.setup_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
 	game_over_panel.hide()
 	stage_clear_panel.hide()
 	hp_bar.value = hp_bar.max_value
@@ -82,47 +90,33 @@ func _on_gold_changed(amount: int) -> void:
 	gold_label.text = "金币: %d" % amount
 
 
-func _on_wave_changed(wave: int, _total: int, kills: int, target: int) -> void:
-	var idx: int = wave - 1
-	if idx < 0 or idx > 2:
-		return
-
-	for i in 3:
+func _on_wave_changed(wave: int, total: int) -> void:
+	for i in range(3):
 		var bar: ProgressBar = wave_bars[i]
-		if i < idx:
-			# 已完成的波次 — 满条绿色
-			bar.value = bar.max_value
-			_modulate_bar(bar, Color(0.25, 0.65, 0.25))
-		elif i == idx:
-			# 当前波次 — 进度条高亮
-			bar.max_value = target
-			bar.value = kills
+		if i + 1 == wave:
+			# 当前波次 — 橙色
 			_modulate_bar(bar, Color(0.85, 0.55, 0.15))
+			bar.value = bar.max_value
+		elif i + 1 < wave:
+			# 已过波次 — 绿色
+			_modulate_bar(bar, Color(0.25, 0.65, 0.25))
+			bar.value = bar.max_value
 		else:
-			# 未开始的波次 — 空白置灰
-			bar.value = 0
+			# 未开始 — 灰色
 			_modulate_bar(bar, Color(0.3, 0.3, 0.3))
-		_wave_label_text(i)
+			bar.value = 0
+		wave_labels[i].text = "%d/%d" % [i + 1, total]
 
 
 func _init_wave_display() -> void:
-	for i in 3:
+	for i in range(3):
 		var bar: ProgressBar = wave_bars[i]
-		bar.value = 0
 		if i == 0:
 			_modulate_bar(bar, Color(0.85, 0.55, 0.15))
-			bar.max_value = 15
 		else:
 			_modulate_bar(bar, Color(0.3, 0.3, 0.3))
-			bar.max_value = 15 + i * 5
-		_wave_label_text(i)
-
-
-func _wave_label_text(idx: int) -> void:
-	var bar: ProgressBar = wave_bars[idx]
-	var kills: int = int(bar.value)
-	var target: int = int(bar.max_value)
-	wave_labels[idx].text = "%d/%d" % [kills, target]
+		bar.value = 0
+		wave_labels[i].text = "%d/3" % [i + 1]
 
 
 func _modulate_bar(bar: ProgressBar, color: Color) -> void:
@@ -135,8 +129,12 @@ func _modulate_bar(bar: ProgressBar, color: Color) -> void:
 	bar.add_theme_stylebox_override("fill", style)
 
 
+func _on_enemies_remaining_changed(count: int) -> void:
+	# kill_all 模式显示剩余僵尸数
+	pass
+
+
 func _on_stage_clear() -> void:
-	# 自动完成关卡并返回地图
 	ProgressManager.complete_stage(ProgressManager.current_chapter, ProgressManager.current_stage)
 	SaveManager.save_game()
 	_go_to_map()
@@ -149,7 +147,6 @@ func _on_restart_pressed() -> void:
 
 
 func _on_gameover_map_pressed() -> void:
-	# 返回地图 — 清除已装备，保留背包和金币
 	UpgradeManager.clear_equipped()
 	GameManager.reset_for_new_stage()
 	SaveManager.save_game()

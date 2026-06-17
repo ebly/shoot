@@ -6,6 +6,8 @@ var player_texture: ImageTexture
 var enemy_texture: ImageTexture
 var fast_enemy_texture: ImageTexture
 var spitter_texture: ImageTexture
+var boss_texture: ImageTexture
+var spit_texture: ImageTexture
 var bullet_texture: ImageTexture
 var xp_orb_texture: ImageTexture
 var gold_coin_texture: ImageTexture
@@ -17,7 +19,9 @@ func _ready() -> void:
 	enemy_texture = _make_from_pattern(ENEMY_PATTERN, ENEMY_COLORS)
 	fast_enemy_texture = _make_from_pattern(FAST_ENEMY_PATTERN, FAST_ENEMY_COLORS)
 	spitter_texture = _make_from_pattern(SPITTER_PATTERN, SPITTER_COLORS)
-	bullet_texture = _make_dot(6, Color(1.0, 0.85, 0.2, 1.0))
+	boss_texture = _make_dot(14, Color(0.65, 0.15, 0.15, 1.0))
+	bullet_texture = _make_dot(4, Color(0.55, 0.55, 0.58, 1.0))
+	spit_texture = _make_dot(6, Color(0.3, 0.85, 0.25, 1.0))
 	xp_orb_texture = _make_from_pattern(XP_PATTERN, XP_COLORS)
 	gold_coin_texture = _make_dot(8, Color(1.0, 0.80, 0.10, 1.0))
 	star_texture = _make_dot(3, Color(0.9, 0.9, 0.95, 0.7))
@@ -28,6 +32,8 @@ func get_texture(key: String) -> ImageTexture:
 		"enemy_texture": return enemy_texture
 		"fast_enemy_texture": return fast_enemy_texture
 		"spitter_texture": return spitter_texture
+		"boss_texture": return boss_texture
+		"spit_texture": return spit_texture
 		"player_texture": return player_texture
 		"bullet_texture": return bullet_texture
 		"xp_orb_texture": return xp_orb_texture

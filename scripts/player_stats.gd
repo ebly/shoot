@@ -1,6 +1,6 @@
 class_name PlayerStats
 extends Resource
-## Runtime stats for the player — mutated by upgrades and reset on new game.
+## 玩家属性 — 初始值从 Players.get_current() 读取，升级可修改。
 
 @export var max_hp: float = 100.0
 @export var hp: float = 100.0
@@ -10,24 +10,23 @@ extends Resource
 @export var fire_rate_mult: float = 1.0
 @export var bullet_speed_mult: float = 1.0
 @export var bullet_size_mult: float = 1.0
-@export var extra_projectiles: int = 1   # 弹道数（默认1发）
+@export var extra_projectiles: int = 1
 @export var magnet_radius: float = 60.0
 @export var xp_mult: float = 1.0
 @export var body_size: float = 1.0
-@export var attack_range: float = 200.0  # 射程
 
 
 func reset() -> void:
-	max_hp = 100.0
-	hp = 100.0
-	hp_regen = 0.5
-	move_speed = 280.0
-	damage_mult = 1.0
-	fire_rate_mult = 1.0
-	bullet_speed_mult = 1.0
-	bullet_size_mult = 1.0
-	extra_projectiles = 1
-	magnet_radius = 60.0
-	xp_mult = 1.0
-	body_size = 1.0
-	attack_range = 200.0
+	var cfg: Dictionary = Players.get_current()
+	max_hp      = cfg.get("max_hp", 100.0)
+	hp          = max_hp
+	hp_regen    = cfg.get("hp_regen", 0.0)
+	move_speed  = cfg.get("speed", 280.0)
+	damage_mult = cfg.get("damage_mult", 1.0)
+	fire_rate_mult = cfg.get("fire_rate_mult", 1.0)
+	bullet_speed_mult = cfg.get("bullet_speed_mult", 1.0)
+	bullet_size_mult = cfg.get("bullet_size_mult", 1.0)
+	extra_projectiles = int(cfg.get("extra_projectiles", 1))
+	magnet_radius = cfg.get("magnet_radius", 60.0)
+	xp_mult     = cfg.get("xp_mult", 1.0)
+	body_size   = cfg.get("body_size", 1.0)

@@ -3,9 +3,9 @@ extends Weapon
 
 
 func _ready() -> void:
-	fire_rate = 1.2
-	base_damage = 15.0
-	bullet_speed = 420.0
+	fire_rate = ConfigData.WEAPON.fire_rate
+	base_damage = ConfigData.WEAPON.base_damage
+	bullet_speed = ConfigData.WEAPON.bullet_speed
 
 
 func _process(delta: float) -> void:

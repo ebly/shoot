@@ -16,6 +16,7 @@ func _ready() -> void:
 
 	if stats == null:
 		stats = PlayerStats.new()
+		stats.reset()
 
 	# collision shape
 	var shape: CircleShape2D = CircleShape2D.new()

@@ -3,11 +3,8 @@
 [ext_resource type="Script" path="res://scripts/ui/backpack_slot.gd" id="1_slot"]
 
 [node name="BackpackSlot" type="Panel"]
-custom_minimum_size = Vector2(70, 70)
+custom_minimum_size = Vector2(64, 64)
 script = ExtResource("1_slot")
-theme_overrides = {
-"panels/background_color": Color(0.15, 0.13, 0.18, 1)
-}
 
 [node name="VBox" type="VBoxContainer" parent="."]
 anchors_preset = 15
@@ -39,7 +36,20 @@ text = "×1"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 10
 
-[node name="EquipButton" type="Button" parent="VBox"]
-text = "装备"
-theme_override_font_sizes/font_size = 9
-custom_minimum_size = Vector2(0, 20)
+[node name="HBox" type="HBoxContainer" parent="VBox"]
+theme_override_constants/separation = 2
+
+[node name="ActionButton" type="Button" parent="VBox/HBox"]
+text = "装 备"
+theme_override_font_sizes/font_size = 8
+custom_minimum_size = Vector2(0, 18)
+size_flags_horizontal = 3
+
+[node name="DiscardButton" type="Button" parent="VBox/HBox"]
+text = "丢 弃"
+theme_override_font_sizes/font_size = 8
+custom_minimum_size = Vector2(0, 18)
+size_flags_horizontal = 2
+
+[connection signal="pressed" from="VBox/HBox/ActionButton" to="." method="_on_action_button_pressed"]
+[connection signal="pressed" from="VBox/HBox/DiscardButton" to="." method="_on_discard_button_pressed"]
